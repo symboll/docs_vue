@@ -8,7 +8,7 @@
 import { defineComponent, ref, computed } from 'vue'
 
 export default defineComponent({
-  name: 'Demo1',
+  name: 'demo1',
   setup() {
     const count = ref(0)
     const double = computed(()=> {

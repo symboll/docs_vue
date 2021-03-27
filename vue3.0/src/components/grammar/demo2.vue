@@ -12,7 +12,7 @@ interface DataInterface {
 }
 import { defineComponent, reactive, computed } from 'vue'
 export default defineComponent({
-  name: 'Demo2',
+  name: 'demo2',
   setup () {
     const data: DataInterface = reactive({
       count: 0,
