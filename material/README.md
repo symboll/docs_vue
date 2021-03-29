@@ -22,3 +22,11 @@ npm run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+
+### todolist
+```
+导航守卫
+可视化图表
+vuetify 按需加载
+```
