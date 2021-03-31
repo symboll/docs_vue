@@ -16,7 +16,7 @@
 
 <script>
 export default {
-  name: 'authCodeDeleteDialog',
+  name: 'deleteDialog',
   props: {
     visible:{
       type: Boolean,

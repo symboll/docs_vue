@@ -22,21 +22,34 @@
       </div>
 
       <v-spacer></v-spacer>
-
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        text
+      <v-avatar
+        color="accent"
+        size="32"
       >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
+        <img
+          v-if="avatar && avatar !== ''"
+          alt="Avatar"
+          :src="avatar"
+        >
+        <span v-else>{{ username.slice(0,1) }}</span>
+      </v-avatar>
+      <v-btn text class="btn_username">
+        {{ username }}
+      </v-btn>
+      <v-btn
+        text
+        outlined
+        @click="loginOut"
+      >
+        <span class="mr-2">login out</span>
+        <v-icon>mdi-power</v-icon>
       </v-btn>
     </v-app-bar>
 
     <v-navigation-drawer app fixed class="navigation_drwaer">
       <v-card class="mx-auto" max-width="300" tile>
         <v-list shaped>
-          <v-subheader>REPORTS</v-subheader>
+          <!-- <v-subheader>REPORTS</v-subheader> -->
           <v-list-item-group v-model="selectedItem" color="primary">
             <v-list-item
               v-for="(item, i) in items"
@@ -61,28 +74,41 @@
 </template>
 
 <script>
+import { mapMutations, mapState } from 'vuex'
 export default {
   data () {
     return {
       selectedItem: 0,
       items: [
+        { text: '首页', icon: 'mdi-home', path: 'home' },
         { text: '基本设置', icon: 'mdi-account', path: 'basic' },
-        { text: 'Home', icon: 'mdi-clock', path: 'home' },
         { text: 'About', icon: 'mdi-account', path: 'about' }
       ]
     }
   },
-  watch: {
-    '$route' (value) {
-      const name = value.name
-      const index = this.items.findIndex(item => item.path === name)
-      this.selectedItem = index
-    }
+  mounted() {
+    const name = this.$route.name
+    const index = this.items.findIndex(i => i.path === name)
+    this.selectedItem = index
+  },
+  computed: {
+    ...mapState({
+      username: state => state.user.username,
+      avatar: state => state.user.avatar
+    })
   },
   methods: {
+    ...mapMutations([
+      'LOGOUT'
+    ]),
+    
     handleClick (e) {
-      console.log(e)
+      if(this.$route.name == e.path) {return}
       this.$router.push(e.path)
+    },
+    loginOut () {
+      this.LOGOUT()
+      this.$router.push('/login')
     }
   }
 }
@@ -91,7 +117,7 @@ export default {
 
  .v-main__wrap {
     >div{
-      padding: 10px;
+      padding: 6px;
     }
   }
 
@@ -101,5 +127,10 @@ export default {
 .navigation_drwaer{
   top: 64px !important;
 }
+
+
+  .v-btn.btn_username{
+    text-transform: none;
+  }
 
 </style>

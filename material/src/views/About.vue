@@ -1,5 +1,12 @@
 <template>
-  <div class="about">
-    about
-  </div>
+  <div>About</div>
 </template>
+
+<script>
+export default {
+
+}
+
+</script>
+<style scoped>
+</style>

@@ -5,7 +5,8 @@ import state from './state'
 import mutations from './mutations'
 import actions from './actions'
 import user from './module/user'
-import basic from './module/basic'
+import authCode from './module/authCode'
+import role from './module/role'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -14,6 +15,7 @@ export default new Vuex.Store({
   actions,
   modules: {
     user,
-    basic
+    authCode,
+    role
   }
 })

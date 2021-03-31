@@ -1,24 +1,27 @@
-import { login } from '@/api/login'
+import { login, register, getUserInfo, getUserList } from '@/api/user'
 import { setToken } from '@/util/token'
 
 const state = {
-  // moduleKey: 'ssss',
-  // username: '',
-  // avatar: ''
+  username: '',
+  avatar: '',
+  userList: []
 }
 
 const mutations = {
-  // SET_USER_NAME (state, params) {
-  //   state.username = params
-  // },
+  SET_USER_NAME (state, name) {
+    state.username = name
+  },
   // SET_USER_AVATAR (state, params) {
   //   state.avatar = params
   // },
-  // LOGOUT (state, params) {
-  //   state.username = ''
-  //   state.avatar = ''
-  //   setToken('')
-  // }
+  LOGOUT (state) {
+    state.username = ''
+    state.avatar = ''
+    setToken('')
+  },
+  SET_USER_LIST(state, userList) {
+    state.userList = userList
+  }
 }
 
 const actions = {
@@ -31,32 +34,39 @@ const actions = {
         reject(err.response.data)
       })
     })
+  },
+  authorization: ({ commit }) => {
+    return new Promise((resolve, reject) => {
+      getUserInfo().then(res => {
+        commit('SET_USER_NAME', res.data.name)
+        resolve()
+      }).catch(err => {
+        reject(err)
+      })
+    })
+  },
+  registerAction: ({ commit}, data) =>  {
+    return new Promise((resolve, reject)=> {
+      register(data).then(_ => {
+        resolve()
+      }).catch(err => {
+        reject(err)
+      })
+    })
+  },
+  getUserListAction: ({ commit })=> {
+    return new Promise((resolve, reject)=> {
+      getUserList().then(res => {
+        commit("SET_USER_LIST", res.data.users)
+      }).catch(err => {
+        reject(err)
+      })
+    })
   }
-  // authorization: ({ commit }) => {
-  //   return new Promise((resolve, reject) => {
-  //     getUserInfoByToken().then(res => {
-  //     /**
-  //      * 需要后端支持，每次验证，返回新的token
-  //      * setToken(res.data.token)
-  //      */
-  //       commit('SET_USER_NAME', res.data.username)
-  //       commit('SET_USER_AVATAR', res.data.avatar)
-  //       resolve()
-  //     }).catch(err => {
-  //       reject(err.response.data)
-  //     })
-  //   })
-  // }
-}
-const getters = {
-  // modulesKeyGetter: (state) => {
-  //   return state.moduleKey
-  // }
 }
 
 export default {
   state,
-  getters,
   mutations,
   actions
 }

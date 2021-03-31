@@ -28,9 +28,4 @@ export const authCodeDelete = (id) => {
   })
 }
 
-// export const role = () => {
-//   return axios.request({
-//     url: 'role',
-//     loading: true
-//   })
-// }
+

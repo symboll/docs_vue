@@ -1,52 +1,54 @@
 import {
-  authCodeList,
-  authCodeCreate,
-  authCodeUpdate,
-  authCodeDelete
-} from '@/api/basic'
-
+  roleList,
+  roleCreate,
+  roleUpdate,
+  roleDelete
+} from '@/api/role'
 
 const state = {
-  authcode: []
+  roleList: []
 }
+
 const mutations = {
-  SET_AUTH_CODE (state, list) {
-    state.authcode = list
+  SET_ROLE (state, roles) {
+    state.roleList = roles
   }
 }
+
 const actions = {
-  getAuthCodeAction: ({ commit }) => {
+  getRoleAction: ({ commit }) => {
     return new Promise((resolve, reject) => {
-      authCodeList().then(res => {
+      roleList().then(res => {
         if (res.code === 0) {
-          commit('SET_AUTH_CODE', res.data.authcode)
+          commit('SET_ROLE', res.data.roles)
         }
       }).catch(err => {
         reject(err)
       })
     })
   },
-  createAuthCodeAction: ({commit}, data) => {
+
+  createRoleAction: ({commit}, data) => {
     return new Promise((resolve, reject)=> {
-      authCodeCreate(data).then(_ => {
+      roleCreate(data).then(_ => {
         resolve()
       }).catch(err => {
         reject(err)
       })
     })
   },
-  updateAuthCodeAction: ({commit},{ id, ...data }) => {
+  updateRoleAction: ({commit},{ id, ...data }) => {
     return new Promise((resolve, reject)=> {
-      authCodeUpdate(id, data).then(_ => {
+      roleUpdate(id, data).then(_ => {
         resolve()
       }).catch(err => {
         reject(err)
       })
     })
   },
-  deleteAuthCodeAction: ({commit}, id) =>  {
+  deleteRoleAction: ({commit}, id) =>  {
     return new Promise((resolve, reject)=> {
-      authCodeDelete(id).then(_ => {
+      roleDelete(id).then(_ => {
         resolve()
       }).catch(err => {
         reject(err)
@@ -54,8 +56,14 @@ const actions = {
     })
   }
 }
+
+const getters = {
+
+}
+
 export default {
   state,
+  getters,
   mutations,
   actions
 }

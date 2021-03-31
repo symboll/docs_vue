@@ -3,94 +3,102 @@
     <v-row>
       <v-col md="4" offset="8" >
         <v-card>
-          <v-tabs color="deep-purple accent-4" right @change="tabsChange">
+          <v-tabs v-model="tab" color="primary" right @change="tabsChange">
             <v-tab>Login</v-tab>
             <v-tab>Register</v-tab>
+            
+            <v-tabs-items v-model="tab">
+              <v-tab-item>
+                <v-container fluid>
+                  <v-form ref="loginform" v-model="valid" lazy-validation>
+                    <v-text-field
+                      v-model="login.username"
+                      :counter="10"
+                      :rules="nameRules"
+                      label="login name"
+                      required
+                    ></v-text-field>
 
-            <v-tab-item>
-              <v-container fluid>
-                <v-form ref="loginform" v-model="valid" lazy-validation>
-                  <v-text-field
-                    v-model="login.username"
-                    :counter="10"
-                    :rules="nameRules"
-                    label="login name"
-                    required
-                  ></v-text-field>
+                    <v-text-field
+                      v-model="login.password"
+                      :rules="passwordRules"
+                      label="password"
+                      required
+                      counter
+                      :append-icon="lp_show ? 'mdi-eye' : 'mdi-eye-off'"
+                      :type="lp_show ? 'text' : 'password'"
+                      hint="At least 8 characters"
+                      @click:append="lp_show = !lp_show"
+                    ></v-text-field>
 
-                  <v-text-field
-                    v-model="login.password"
-                    :rules="passwordRules"
-                    label="password"
-                    required
-                    counter
-                    :append-icon="lp_show ? 'mdi-eye' : 'mdi-eye-off'"
-                    :type="lp_show ? 'text' : 'password'"
-                    hint="At least 8 characters"
-                    @click:append="lp_show = !lp_show"
-                  ></v-text-field>
+                    <v-btn
+                      :disabled="!valid"
+                      color="primary"
+                      class="mr-4"
+                      @click="handlerLogin"
+                    >
+                      Login
+                    </v-btn>
+                  </v-form>
+                </v-container>
+              </v-tab-item>
+              <v-tab-item>
+                <v-container fluid>
+                  <v-form ref="registerform" v-model="valid" lazy-validation>
+                    <v-text-field
+                      v-model="register.email"
+                      :rules="emailRules"
+                      label="e-mail"
+                      required
+                    ></v-text-field>
 
-                  <v-btn
-                    :disabled="!valid"
-                    color="success"
-                    class="mr-4"
-                    @click="handlerLogin"
-                  >
-                    Login
-                  </v-btn>
-                </v-form>
-              </v-container>
-            </v-tab-item>
-            <v-tab-item>
-              <v-container fluid>
-                <v-form ref="registerform" v-model="valid" lazy-validation>
-                  <v-text-field
-                    v-model="register.email"
-                    :rules="emailRules"
-                    label="e-mail"
-                    required
-                  ></v-text-field>
+                    <v-text-field
+                      v-model="register.username"
+                      :counter="10"
+                      :rules="nameRules"
+                      label="username"
+                      required
+                    ></v-text-field>
 
-                  <v-text-field
-                    v-model="register.username"
-                    :counter="10"
-                    :rules="nameRules"
-                    label="username"
-                    required
-                  ></v-text-field>
+                    <v-text-field
+                      v-model="register.password"
+                      :rules="passwordRules"
+                      label="password"
+                      required
+                      counter
+                      :append-icon="rp_show ? 'mdi-eye' : 'mdi-eye-off'"
+                      :type="rp_show ? 'text' : 'password'"
+                      hint="At least 8 characters"
+                      @click:append="rp_show = !rp_show"
+                    ></v-text-field>
 
-                  <v-text-field
-                    v-model="register.password"
-                    :rules="passwordRules"
-                    label="password"
-                    required
-                    counter
-                    :append-icon="rp_show ? 'mdi-eye' : 'mdi-eye-off'"
-                    :type="rp_show ? 'text' : 'password'"
-                    hint="At least 8 characters"
-                    @click:append="rp_show = !rp_show"
-                  ></v-text-field>
-
-                  <v-btn
-                    :disabled="!valid"
-                    color="success"
-                    class="mr-4"
-                    @click="handlerRegister"
-                  >
-                    Register
-                  </v-btn>
-                </v-form>
-              </v-container>
-            </v-tab-item>
+                    <v-btn
+                      :disabled="!valid"
+                      color="primary"
+                      class="mr-4"
+                      @click="handlerRegister"
+                    >
+                      Register
+                    </v-btn>
+                  </v-form>
+                </v-container>
+              </v-tab-item>
+            </v-tabs-items>
           </v-tabs>
         </v-card>
       </v-col>
     </v-row>
+    <success-alert 
+      :visible="visible"
+      alertText="Register success, Welcome to login!"
+      @close="visible = false"
+    />
   </v-container>
 </template>
 
 <script>
 import { mapActions } from 'vuex'
+import SuccessAlert from '@/components/success.vue'
 export default {
   data: () => ({
     valid: true,
@@ -116,30 +124,49 @@ export default {
     passwordRules: [
       v => !!v || 'password is required',
       v => (v && v.length >= 6) || 'Password must be more than 6 characters'
-    ]
+    ],
+    visible: false,
+    tab: null
   }),
 
   computed: {
 
   },
+  components: {
+    SuccessAlert
+  },
   methods: {
     ...mapActions([
-      'loginAction'
+      'loginAction',
+      'registerAction'
     ]),
+    
     handlerLogin () {
-      this.$refs.loginform.validate()
-      const { username, password } = this.login
-      this.loginAction({ username, password }).then(res => {
-        this.$router.push({ name: 'home' })
-      }).catch(err => {
-        console.log('err==>', err)
-      })
+      if(this.$refs.loginform.validate()){
+        const { username, password } = this.login
+        this.loginAction({ username, password }).then(res => {
+          this.$router.push({ name: 'home' })
+        }).catch(err => {
+          console.log('err==>', err)
+        })
+      }
     },
     handlerRegister () {
-      this.$refs.registerform.validate()
-      // console.log('register', this.register)
+      if(this.$refs.registerform.validate()){
+        const { username, password, email} = this.register
+        this.registerAction({ username, password, email })
+          .then(_ => {
+            this.visible = true
+            this.tab = 0
+            setTimeout(()=> {
+              this.visible = false
+            }, 2000)
+          })
+          .catch(err => console.log('err', err))
+      }
     },
     tabsChange (e) {
+      console.log('tab==>',this.tab)
       if (e === 0 && !this.$refs.registerform) return
       switch (e) {
         case 0:
@@ -149,8 +176,9 @@ export default {
           this.$refs.loginform.reset()
           break
       }
-    }
+    },
   }
 }
 </script>
-<style scoped></style>
+<style lang='scss' scoped>
+</style>

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-dialog v-model="visible" max-width="500px" @click:outside="close">
+    <v-dialog v-model="visible" :max-width="maxWidth" @click:outside="close">
       <v-card>
         <v-card-title>
           <span class="headline">{{ formTitle }}</span>
@@ -9,17 +9,7 @@
         <v-card-text>
           <v-container>
             <v-row>
-              <v-col class="d-flex" cols="12">
-                <v-text-field v-model="form.code" label="code"></v-text-field>
-              </v-col>
-
-              <v-col class="d-flex" cols="12">
-                <v-select
-                  v-model="form.type"
-                  :items="items"
-                  label="type"
-                ></v-select>
-              </v-col>
+              <slot ></slot>
             </v-row>
           </v-container>
         </v-card-text>
@@ -27,10 +17,10 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="blue darken-1" text @click="close">
-            Cancel
+            {{ cancelText }}
           </v-btn>
           <v-btn color="blue darken-1" text @click="save">
-            Save
+            {{ confirmText }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -40,14 +30,17 @@
 
 <script>
 export default {
-  name: "authCodeDialog",
+  name: "DialogWrap",
   data: () => ({
-    items: ["PAGE", "FUNC"]
   }),
   props: {
     visible: {
       type: Boolean,
       default: false
+    },
+    maxWidth: {
+      type: String,
+      default: '500px'
     },
     formTitle: {
       type: String,
@@ -56,6 +49,18 @@ export default {
     form: {
       type: Object,
       default: () => ({})
+    },
+    items: {
+      type: Array,
+      default: ()=> []
+    },
+    cancelText: {
+      type: String,
+      default: "Cancel"
+    },
+    confirmText: {
+      type: String,
+      default: 'Save'
     }
   },
   methods: {
