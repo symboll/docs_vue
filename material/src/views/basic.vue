@@ -76,7 +76,8 @@ export default {
     ...mapActions([
       'getAuthCodeAction',
       'getRoleAction',
-      'getUserListAction'
+      'getUserListAction',
+      "upLoadAction"
     ]),
     init () {
       const p = this.getAuthCodeAction()
@@ -87,7 +88,13 @@ export default {
       }).catch(err => { console.log('err ',err) })
     },
     handleChange (e){
-      console.log(e)
+      const formData = new FormData()
+      formData.append('file', e,  e.name)
+
+      this.upLoadAction(formData).then(res => {
+        console.log('res++', res)
+      }).catch(err => console.log('err', err))
+     
     }
   }
 }

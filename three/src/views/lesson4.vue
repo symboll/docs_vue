@@ -10,68 +10,68 @@ import Stats from 'stats-js'
 // import * as dat from 'dat.gui'
 import ConvexGeometry from '@/lib/ConvexGeometry'
 import '@/lib/ParametricGeometries'
+
+let scene = null
+let camera = null
+let renderer = null
+let spotLight = null
+let ambientLight = null
+let plane = null
+let stats = null
+let controls = null
+let gui = null
+let requestAnimationFrameId = null
+
 export default {
   name: 'lesson4',
   data () {
-    return {
-      scene: null,
-      camera: null,
-      renderer: null,
-      spotLight: null,
-      ambientLight: null,
-
-      plane: null,
-      stats: null,
-      controls: null,
-      gui: null,
-      requestAnimationFrameId: null
-    }
+    return {}
   },
   methods: {
     init () {
       this.statsInit()
       // 场景
-      this.scene = new THREE.Scene()
+      scene = new THREE.Scene()
 
       // 相机
-      this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000)
-      this.camera.position.x = -50
-      this.camera.position.y = 40
-      this.camera.position.z = 20
-      // this.camera.lookAt(this.scene.position);
-      this.camera.lookAt(new THREE.Vector3(-10, 0, 0))
+      camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000)
+      camera.position.x = -50
+      camera.position.y = 40
+      camera.position.z = 20
+      // camera.lookAt(scene.position);
+      camera.lookAt(new THREE.Vector3(-10, 0, 0))
 
       // 渲染器
-      this.renderer = new THREE.WebGLRenderer()
-      this.renderer.setClearColor(new THREE.Color(0xEEEEEE, 1.0)) // 设置renderer 的背景色
-      this.renderer.setSize(window.innerWidth, window.innerHeight) // 设置renderer 的视图大小
-      this.renderer.shadowMapEnabled = true // 开启阴影
+      renderer = new THREE.WebGLRenderer()
+      renderer.setClearColor(new THREE.Color(0xEEEEEE, 1.0)) // 设置renderer 的背景色
+      renderer.setSize(window.innerWidth, window.innerHeight) // 设置renderer 的视图大小
+      renderer.shadowMapEnabled = true // 开启阴影
 
       // 环境光
-      this.ambientLight = new THREE.AmbientLight(0x090909)
-      this.scene.add(this.ambientLight)
+      ambientLight = new THREE.AmbientLight(0x090909)
+      scene.add(ambientLight)
 
       // 聚光灯光源
-      this.spotLight = new THREE.SpotLight(0xffffff)
-      this.spotLight.position.set(-40, 40, 50)
-      this.spotLight.castShadow = true
-      this.scene.add(this.spotLight)
+      spotLight = new THREE.SpotLight(0xffffff)
+      spotLight.position.set(-40, 40, 50)
+      spotLight.castShadow = true
+      scene.add(spotLight)
 
       // 添加平面plane
       let planeGeometry = new THREE.PlaneGeometry(60, 40, 1, 1)
       let planeMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff })
-      this.plane = new THREE.Mesh(planeGeometry, planeMaterial)
-      this.plane.receiveShadow = true // 开启接收阴影
-      this.plane.rotation.x = -0.5 * Math.PI
-      this.plane.position.x = 0
-      this.plane.position.y = 0
-      this.plane.position.z = 0
-      this.scene.add(this.plane)
+      plane = new THREE.Mesh(planeGeometry, planeMaterial)
+      plane.receiveShadow = true // 开启接收阴影
+      plane.rotation.x = -0.5 * Math.PI
+      plane.position.x = 0
+      plane.position.y = 0
+      plane.position.z = 0
+      scene.add(plane)
 
-      this.addGeometries(this.scene)
-      this.$refs.three.appendChild(this.renderer.domElement)
+      this.addGeometries(scene)
+      this.$refs.three.appendChild(renderer.domElement)
 
-      this.step = 0
+      let step = 0
       this.renderScene()
     },
     addGeometries (scene) {
@@ -135,26 +135,26 @@ export default {
       }
     },
     renderScene () {
-      this.stats.update()
-      this.requestAnimationFrameId = requestAnimationFrame(this.renderScene)
-      this.renderer.render(this.scene, this.camera)
+      stats.update()
+      requestAnimationFrameId = requestAnimationFrame(this.renderScene)
+      renderer.render(scene, camera)
     },
     statsInit () {
-      this.stats = new Stats()
-      this.stats.setMode(0) // 0: fps, 1: ms
-      // this.stats.domElement.style.position = 'absolute'
-      // this.stats.domElement.style.left = '0px'
-      // this.stats.domElement.style.top = '0px'
+      stats = new Stats()
+      stats.setMode(0) // 0: fps, 1: ms
+      // stats.domElement.style.position = 'absolute'
+      // stats.domElement.style.left = '0px'
+      // stats.domElement.style.top = '0px'
 
-      this.$refs.stats.appendChild(this.stats.domElement)
+      this.$refs.stats.appendChild(stats.domElement)
     }
   },
   mounted () {
     this.init()
   },
   beforeDestroy() {
-    cancelAnimationFrame(this.requestAnimationFrameId)
-    // this.gui.domElement.remove()
+    cancelAnimationFrame(requestAnimationFrameId)
+    // gui.domElement.remove()
   }
 }
 </script>

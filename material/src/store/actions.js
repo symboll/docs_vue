@@ -1,17 +1,16 @@
-// const update = () => {
-//   return new Promise((resolve, reject) => {
-//     setTimeout(() => {
-//       resolve('new app Key')
-//     }, 2000)
-//   })
-// }
-
+import { upload } from '@/api/upload'
+ 
 const actions = {
-  // updateAppKey ({ commit }) {
-  //   update().then(res => {
-  //     commit('SET_APP_KEY', { key: res })
-  //   })
-  // }
+  upLoadAction: ({ commit }, data) => {
+    return new Promise((resolve,reject)=> {
+      upload(data).then(res => {
+        console.log('res==>', res)
+        resolve(res)
+      }).catch(err => {
+        reject(err)
+      })
+    })
+  }
 }
 
 export default actions
