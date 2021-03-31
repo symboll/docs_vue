@@ -23,7 +23,7 @@ const actions = {
           commit('SET_ROLE', res.data.roles)
         }
       }).catch(err => {
-        reject(err)
+        reject(err.response.data)
       })
     })
   },
@@ -33,7 +33,7 @@ const actions = {
       roleCreate(data).then(_ => {
         resolve()
       }).catch(err => {
-        reject(err)
+        reject(err.response.data)
       })
     })
   },
@@ -42,7 +42,7 @@ const actions = {
       roleUpdate(id, data).then(_ => {
         resolve()
       }).catch(err => {
-        reject(err)
+        reject(err.response.data)
       })
     })
   },
@@ -51,7 +51,7 @@ const actions = {
       roleDelete(id).then(_ => {
         resolve()
       }).catch(err => {
-        reject(err)
+        reject(err.response.data)
       })
     })
   }

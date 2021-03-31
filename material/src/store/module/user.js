@@ -41,7 +41,7 @@ const actions = {
         commit('SET_USER_NAME', res.data.name)
         resolve()
       }).catch(err => {
-        reject(err)
+        reject(err.response.data)
       })
     })
   },
@@ -50,7 +50,7 @@ const actions = {
       register(data).then(_ => {
         resolve()
       }).catch(err => {
-        reject(err)
+        reject(err.response.data)
       })
     })
   },
@@ -59,7 +59,7 @@ const actions = {
       getUserList().then(res => {
         commit("SET_USER_LIST", res.data.users)
       }).catch(err => {
-        reject(err)
+        reject(err.response.data)
       })
     })
   }

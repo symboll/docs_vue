@@ -8,12 +8,12 @@
       <template v-slot:item.role="{ item }">
         <v-chip
           v-for="i in computedRole(item)"
-          :key="i"
+          :key="i.name"
           color="black32"
           dark
           class="mr-2 mb-2 mt-2"
         >
-          {{ i }}
+          {{ i.name }}
         </v-chip>
       </template>
       <template v-slot:item.actions="{ item }">
@@ -45,7 +45,7 @@ export default {
     id: '',
     headers: [
       { text: 'username', value: 'username' ,sortable: false ,align: 'start' },
-      { text: 'e-mail', value: 'email', sortable: false  },
+      { text: 'E-mail', value: 'email', sortable: false  },
       { text: 'role', value: 'role' ,sortable: false},
       { text: 'Actions', value: 'actions' , sortable: false},
     ],
@@ -53,8 +53,16 @@ export default {
 
   computed: {
     ...mapState({
-      users: state => state.user.userList
+      users: state => state.user.userList,
+      roles: state => state.role.roleList
     }),
+    roleMap () {
+      const map = new Map()
+      this.roles.map(item => {
+        map.set(item._id, { name: item.name })
+      })
+      return map
+    }
   },
   methods: {
     ...mapActions([
@@ -64,7 +72,7 @@ export default {
       this.getUserListAction().catch(err => console.log('err',err))
     },
     computedRole(item) {
-      return item.role.map(i => i.name)
+      return item.role.map(i =>  this.roleMap.get(i) )
     },
 
     handleEdit(item){
@@ -75,12 +83,4 @@ export default {
 
 </script>
 <style lang="scss" scoped>
-// .checkbox_wrap {
-//   width: 100%;
-//   display: flex;
-//   flex-wrap: wrap;
-//   > .v-input {
-//     margin-right: 6px;
-//   }
-// }
 </style>

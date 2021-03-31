@@ -88,9 +88,10 @@
         </v-card>
       </v-col>
     </v-row>
-    <success-alert 
+    <alert 
+      :type="alertType"
       :visible="visible"
-      alertText="Register success, Welcome to login!"
+      :alertText="alertText"
       @close="visible = false"
     />
   </v-container>
@@ -98,7 +99,7 @@
 
 <script>
 import { mapActions } from 'vuex'
-import SuccessAlert from '@/components/success.vue'
+import Alert from '@/components/alert.vue'
 export default {
   data: () => ({
     valid: true,
@@ -126,6 +127,8 @@ export default {
       v => (v && v.length >= 6) || 'Password must be more than 6 characters'
     ],
     visible: false,
+    alertType: "",
+    alertText: "",
     tab: null
   }),
 
@@ -133,21 +136,28 @@ export default {
 
   },
   components: {
-    SuccessAlert
+    Alert
   },
   methods: {
     ...mapActions([
       'loginAction',
       'registerAction'
     ]),
-    
+    message (alertType, alertText) {
+      this.visible = true
+      this.alertType = alertType
+      this.alertText = alertText
+      setTimeout(()=> {
+        this.visible = false
+      }, 2000)
+    },
     handlerLogin () {
       if(this.$refs.loginform.validate()){
         const { username, password } = this.login
         this.loginAction({ username, password }).then(res => {
           this.$router.push({ name: 'home' })
         }).catch(err => {
-          console.log('err==>', err)
+          this.message('error', `Error: ${err.message}`)
         })
       }
     },
@@ -156,13 +166,12 @@ export default {
         const { username, password, email} = this.register
         this.registerAction({ username, password, email })
           .then(_ => {
-            this.visible = true
+            this.message('success', 'Register success, Welcome to login!')
             this.tab = 0
-            setTimeout(()=> {
-              this.visible = false
-            }, 2000)
           })
-          .catch(err => console.log('err', err))
+          .catch(err => {
+            this.message('error', `Error: ${err.message}`)
+          })
       }
     },
     tabsChange (e) {

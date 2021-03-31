@@ -10,7 +10,7 @@
       :attach="wrap"
       >
       <v-card>
-        <v-alert type="success" >
+        <v-alert :type="type" >
           {{ alertText }}
         </v-alert>
       </v-card>
@@ -20,7 +20,7 @@
 
 <script>
 export default {
-  name: "success",
+  name: "alert",
   data: ()=> ({
     wrap: null
   }),
@@ -32,6 +32,10 @@ export default {
     alertText: {
       type: String,
       default: ''
+    },
+    type: {
+      type: String,
+      default: 'success'
     }
   },
   mounted() {
@@ -39,7 +43,6 @@ export default {
   },
   methods: {
     close () {
-      // this.visible = false
       this.$emit('close')
     }
   }

@@ -22,7 +22,7 @@ const actions = {
           commit('SET_AUTH_CODE', res.data.authcode)
         }
       }).catch(err => {
-        reject(err)
+        reject(err.response.data)
       })
     })
   },
@@ -31,7 +31,7 @@ const actions = {
       authCodeCreate(data).then(_ => {
         resolve()
       }).catch(err => {
-        reject(err)
+        reject(err.response.data)
       })
     })
   },
@@ -40,7 +40,7 @@ const actions = {
       authCodeUpdate(id, data).then(_ => {
         resolve()
       }).catch(err => {
-        reject(err)
+        reject(err.response.data)
       })
     })
   },
@@ -49,7 +49,7 @@ const actions = {
       authCodeDelete(id).then(_ => {
         resolve()
       }).catch(err => {
-        reject(err)
+        reject(err.response.data)
       })
     })
   }
