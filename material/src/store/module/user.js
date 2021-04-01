@@ -4,7 +4,9 @@ import { setToken } from '@/util/token'
 const state = {
   username: '',
   avatar: '',
-  userList: []
+  userList: [],
+  loading: false,
+  total: 0
 }
 
 const mutations = {
@@ -21,6 +23,12 @@ const mutations = {
   },
   SET_USER_LIST(state, userList) {
     state.userList = userList
+  },
+  SET_USER_TOTAL (state, total) {
+    state.total = total
+  },
+  SET_TABLE_LOADING (state, bool) {
+    state.loading = bool
   }
 }
 
@@ -54,11 +62,15 @@ const actions = {
       })
     })
   },
-  getUserListAction: ({ commit })=> {
+  getUserListAction: ({ commit },params={})=> {
     return new Promise((resolve, reject)=> {
-      getUserList().then(res => {
-        commit("SET_USER_LIST", res.data.users)
+      commit('SET_TABLE_LOADING', true)
+      getUserList(params).then(res => {
+        commit("SET_USER_LIST", res.data.users || [])
+        commit("SET_USER_TOTAL", res.data.total)
+        commit('SET_TABLE_LOADING', false)
       }).catch(err => {
+        commit('SET_TABLE_LOADING', false)
         reject(err.response.data)
       })
     })

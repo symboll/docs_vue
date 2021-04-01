@@ -1,16 +1,17 @@
 <template>
   <div>
-    <div>
-      <v-row>
-        <v-col >
-          <v-btn color="primary" @click="handleCreate">create</v-btn>
-        </v-col>
-      </v-row>
-    </div>
+    <table-header 
+      :options="searchOptions"
+      @search="search"
+      @create="handleCreate"
+      :outerItems="authCodes"
+    />
     <v-data-table
       :headers="headers"
       :items="roles"
-      :items-per-page="5"
+      :loading="loading"
+      :options.sync="options"
+      :server-items-length="total"
     >
       <template v-slot:item.auth="{ item }">
         <v-chip
@@ -84,11 +85,13 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import DeleteDialog from '@/components/delete_dialog'
-import DialogWrap from '@/components/dialog_wrap';
+import DialogWrap from '@/components/dialog_wrap'
+import TableHeader from '@/components/table_header'
 export default {
   components: {
     DialogWrap,
     DeleteDialog,
+    TableHeader
   },
   data: ()=> ({
     visible: false,
@@ -99,17 +102,51 @@ export default {
     deleteId: '',
     items: [1,2,3,4,5,6,7,8,9,10],
     headers: [
-      { text: 'role', value: 'name',sortable: false, align: 'start' },
+      { text: 'name', value: 'name',sortable: false, align: 'start' },
       { text: 'level', value: 'level' },
       { text: 'auth', value: 'auth' ,sortable: false, width: '70%'},
       { text: 'Actions', value: 'actions', sortable: false },
     ],
+    options: {
+      page: 1,
+      itemsPerPage: 10
+    },
+    searchOptions: [
+      { 
+        value: '',
+        label: 'name',
+        type: 'input'
+      },
+      { 
+        value: '',
+        label: 'level',
+        type: 'input'
+      },
+      { 
+        value: '',
+        label: 'auth',
+        type: 'select',
+        multiple: true,
+        outerItems: true,
+        itemText: 'code',
+        itemValue: '_id'
+      }
+    ]
   }),
-
+  watch: {
+    'options.page' (page) {
+      this.query()
+    },
+    'options.itemsPerPage' (itemsPerPage) {
+      this.query()
+    }
+  },
   computed: {
     ...mapState({
       roles:  state => state.role.roleList,
-      authCodes: state => state.authCode.authcodeList
+      authCodes: state => state.authCode.authcodeAllList,
+      total: state => state.role.total,
+      loading: state => state.role.loading,
     }),
     codeMap () {
       const map = new Map()
@@ -129,8 +166,19 @@ export default {
       'updateRoleAction',
       'deleteRoleAction'
     ]),
-    init (){
-      this.getRoleAction().catch(err => console.log('err',err))
+    search (options) {
+      const query = {}
+      options.forEach(item => {
+        if(item.value) query[item.label] = item.value  
+      })
+      this.getRoleAction(query).catch(err => console.log('err', err))
+    },
+    query (isCreateOrDelete = false) {
+      const { page=1, itemsPerPage=10 } = this.options
+      this.getRoleAction({
+        pageSize: isCreateOrDelete ? 10: itemsPerPage,
+        pageNo: isCreateOrDelete? 1:  page
+      }).catch(err => console.log('err',err))
     },
     computedCode (item) {
       return item.auth.map(i => this.codeMap.get(i))
@@ -154,11 +202,11 @@ export default {
       const { name, level, auth } = form;
       if (this.id === "") {
         this.createRoleAction({ name, level, auth })
-          .then(_ => this.init())
+          .then(_ => this.query(true))
           .catch(err => console.log("err", err));
       } else {
         this.updateRoleAction({ id: this.id, name, level, auth })
-          .then(_ => this.init())
+          .then(_ => this.query())
           .catch(err => console.log("err", err));
       }
       this.id = "";
@@ -176,7 +224,7 @@ export default {
     },
     deleteFormItem(){
       this.deleteRoleAction(this.deleteId)
-        .then(_ => this.init())
+        .then(_ => this.query(true))
         .catch(err => console.log('err',err))
       this.deleteFormClose()
     }

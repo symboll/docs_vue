@@ -23,8 +23,9 @@ export const register = (data) => {
   })
 }
 
-export const getUserList = () => {
+export const getUserList = (params) => {
   return axios.request({
     url: 'user',
+    params
   })
 }

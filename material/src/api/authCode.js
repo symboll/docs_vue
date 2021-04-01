@@ -1,10 +1,10 @@
 import axios from './index'
 
-export const authCodeList = (query) => {
+export const authCodeList = (params) => {
   return axios.request({
     url: 'authcode',
     method: 'GET',
-    query
+    params
   })
 }
 export const authCodeCreate = (data) => {

@@ -6,23 +6,43 @@ import {
 } from '@/api/role'
 
 const state = {
-  roleList: []
+  roleList: [],
+  roleAllList: [],
+  loading: false,
+  total: 0
 }
 
 const mutations = {
   SET_ROLE (state, roles) {
-    state.roleList = roles
+    if(state.roleAllList.length === 0) {
+      state.roleAllList = roles
+    }  
+    if(state.roleAllList.length === 0 && roles.length > 10) {
+      state.roleList = roles.slice(0,10)
+    }else {
+      state.roleList = roles
+    }
+  },
+  SET_ROLE_TOTAL (state, total) {
+    state.total = total
+  },
+  SET_TABLE_LOADING (state, bool) {
+    state.loading = bool
   }
 }
 
 const actions = {
-  getRoleAction: ({ commit }) => {
+  getRoleAction: ({ commit }, params={}) => {
     return new Promise((resolve, reject) => {
-      roleList().then(res => {
+      commit('SET_TABLE_LOADING', true)
+      roleList(params).then(res => {
         if (res.code === 0) {
-          commit('SET_ROLE', res.data.roles)
+          commit('SET_ROLE', res.data.roles || [])
+          commit('SET_ROLE_TOTAL', res.data.total)
+          commit('SET_TABLE_LOADING', false)
         }
       }).catch(err => {
+        commit('SET_TABLE_LOADING', false)
         reject(err.response.data)
       })
     })

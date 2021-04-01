@@ -1,14 +1,17 @@
 <template>
   <div>
-    <div>
-      <v-row>
-        <v-col>
-          <v-btn color="primary" @click="handleCreate">create</v-btn>
-        </v-col>
-      </v-row>
-    </div>
-
-    <v-data-table :headers="headers" :items="list" :items-per-page="5">
+    <table-header
+      :options="searchOptions"
+      @search="search"
+      @create="handleCreate"
+    />  
+    <v-data-table 
+      :headers="headers"
+      :items="list" 
+      :loading="loading"
+      :options.sync="options"
+      :server-items-length="total"
+      >
       <template v-slot:item.type="{ item }">
         <v-chip :color="item.type === 'FUNC' ? 'primary' : 'error'" dark>
           {{ item.type }}
@@ -54,14 +57,15 @@
 
 <script>
 import { mapActions, mapState } from "vuex";
-import DeleteDialog from "@/components/delete_dialog";
-import DialogWrap from '@/components/dialog_wrap';
-
+import DeleteDialog from "@/components/delete_dialog"
+import DialogWrap from '@/components/dialog_wrap'
+import TableHeader from '@/components/table_header'
 export default {
   name: "authCode",
   components: {
     DialogWrap,
-    DeleteDialog
+    DeleteDialog,
+    TableHeader
   },
   data: () => ({
     visible: false,
@@ -75,13 +79,40 @@ export default {
       { text: "code",  value: "code", align: "start", sortable: false, width: '400'  },
       { text: "type", value: "type", },
       { text: "Actions", value: "actions", sortable: false }
+    ],
+    options: {
+      page: 1,
+      itemsPerPage: 10
+    },
+    searchOptions:[
+      { 
+        value: '',
+        label: 'code',
+        type: 'input'
+      },
+      { 
+        value: '',
+        label: 'type',
+        type: 'select',
+        items: ['PAGE', 'FUNC']
+      }
     ]
   }),
 
   computed: {
     ...mapState({
-      list: state => state.authCode.authcodeList
+      list: state => state.authCode.authcodeList,
+      total: state => state.authCode.total,
+      loading: state => state.authCode.loading,
     })
+  },
+  watch: {
+    'options.page' (page) {
+      this.query()
+    },
+    'options.itemsPerPage' (itemsPerPage) {
+      this.query()
+    }
   },
   methods: {
     ...mapActions([
@@ -90,8 +121,19 @@ export default {
       "updateAuthCodeAction",
       "deleteAuthCodeAction"
     ]),
-    init () {
-      this.getAuthCodeAction().catch(err => console.log('err',err))
+    search (options) {
+      const query = {}
+      options.forEach(item => {
+        if(item.value) query[item.label] = item.value  
+      })
+      this.getAuthCodeAction(query).catch(err => console.log('err', err))
+    },
+    query (isCreateOrDelete = false) {
+      const { page=1, itemsPerPage=10 } = this.options
+      this.getAuthCodeAction({
+        pageSize: isCreateOrDelete ? 10: itemsPerPage,
+        pageNo: isCreateOrDelete? 1:  page
+      }).catch(err => console.log('err',err))
     },
     handleCreate() {
       (this.visible = true), (this.formTitle = "Create Form");
@@ -111,11 +153,11 @@ export default {
       const { type, code } = form;
       if (this.id === "") {
         this.createAuthCodeAction({ type, code })
-          .then(_ => this.init())
+          .then(_ => this.query(true))
           .catch(err => console.log("err", err));
       } else {
         this.updateAuthCodeAction({ id: this.id, type, code })
-          .then(_ => this.init())
+          .then(_ => this.query())
           .catch(err => console.log("err", err));
       }
       this.id = "";
@@ -134,11 +176,22 @@ export default {
     },
     deleteFormItem() {
       this.deleteAuthCodeAction(this.deleteId)
-        .then(_ => this.init())
+        .then(_ => this.query(true))
         .catch(err => console.log("err", err));
       this.deleteFormClose();
     }
   }
 };
 </script>
-<style scoped></style>
+<style lang='scss' scoped>
+// .v__header {
+//   display: flex;
+//   align-items: center;
+//   > button {
+//     margin-right: 40px;
+//   }
+//   > div {
+//     flex: 1;
+//   }
+// }
+</style>

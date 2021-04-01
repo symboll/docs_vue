@@ -68,7 +68,9 @@
       </v-card>
     </v-navigation-drawer>
     <v-main class="main_p10">
-      <router-view />
+      <keep-alive>
+        <router-view include='basic'/>
+      </keep-alive>
     </v-main>
   </v-app>
 </template>
@@ -114,23 +116,18 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-
- .v-main__wrap {
-    >div{
-      padding: 6px;
-    }
+.v-main__wrap {
+  >div{
+    padding: 6px;
   }
-
+}
 .app_bar{
   left: 0px !important;
 }
 .navigation_drwaer{
   top: 64px !important;
 }
-
-
-  .v-btn.btn_username{
-    text-transform: none;
-  }
-
+.v-btn.btn_username{
+  text-transform: none;
+}
 </style>

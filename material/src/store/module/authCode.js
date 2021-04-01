@@ -7,21 +7,43 @@ import {
 
 
 const state = {
-  authcodeList: []
+  authcodeList: [],
+  authcodeAllList: [],
+  total: 0,
+  loading: false,
+  options: {}
 }
 const mutations = {
   SET_AUTH_CODE (state, list) {
-    state.authcodeList = list
-  }
+    if(state.authcodeAllList.length === 0) {
+      state.authcodeAllList = list
+    }  
+    if(state.authcodeAllList.length === 0 && list.length > 10) {
+      state.authcodeList = list.slice(0,10)
+    } else {
+      state.authcodeList = list
+    }
+  },
+  SET_LIST_TOTAL (state, total) {
+    state.total = total
+  },
+  SET_TABLE_LOADING (state, bool) {
+    state.loading = bool
+  },
+
 }
 const actions = {
-  getAuthCodeAction: ({ commit }) => {
+  getAuthCodeAction: ({ commit }, params ={}) => {
     return new Promise((resolve, reject) => {
-      authCodeList().then(res => {
+      commit('SET_TABLE_LOADING', true)
+      authCodeList(params).then(res => {
         if (res.code === 0) {
-          commit('SET_AUTH_CODE', res.data.authcode)
+          commit('SET_TABLE_LOADING', false)
+          commit('SET_AUTH_CODE', res.data.authcode || [])
+          commit('SET_LIST_TOTAL', res.data.total)
         }
       }).catch(err => {
+        commit('SET_TABLE_LOADING', false)
         reject(err.response.data)
       })
     })

@@ -11,8 +11,7 @@
         <h4>{{ item }}</h4>
       </v-tab>
     </v-tabs>
-    <div class="h10"></div>
-    <v-tabs-items v-model="tab">
+    <v-tabs-items v-model="tab" >
       <v-tab-item>
         <v-card flat>
           <v-file-input
@@ -69,7 +68,7 @@ export default {
     Role,
     User
   },
-    mounted() {
+  mounted() {
     this.init()
   },
   methods: {
@@ -101,7 +100,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.h10{
-  height: 10px;
-}
 </style>

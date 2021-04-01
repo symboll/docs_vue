@@ -1,10 +1,10 @@
 import axios from './index'
 
-export const roleList = (query) => {
+export const roleList = (params) => {
   return axios.request({
     url: 'role',
     method: 'GET',
-    query
+    params
   })
 }
 export const roleCreate = (data) => {

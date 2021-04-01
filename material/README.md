@@ -26,7 +26,11 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 
 ### todolist
 ```
-导航守卫
 可视化图表
 vuetify 按需加载
+```
+### bug
+```
+前端:   角色 查询的时候 auth数组无效
+后端：  token 尚未做续命功能
 ```
