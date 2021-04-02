@@ -6,7 +6,7 @@
           @click="create" 
           color="primary"
         >
-          <v-icon>mdi-folder-plus-outline</v-icon>  Create
+          <v-icon class="mr4">mdi-folder-plus-outline</v-icon>  Create
         </v-btn>
       </v-col>
       <v-col :md="item.multiple ? 3: 2"  v-for="item in options" :key="item.label">
@@ -74,5 +74,8 @@ export default {
 <style lang="scss" scoped>
 .header_search {
   transform: translateY(13px);
+}
+.mr4 {
+  margin-right: 4px;
 }
 </style>

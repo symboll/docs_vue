@@ -4,6 +4,7 @@
       :options="searchOptions"
       @search="search"
       :createBtn="false"
+      :outerItems="roles"
     />
     <v-data-table
       :headers="headers"
@@ -27,12 +28,18 @@
         <v-icon
           small
           class="mr-2"
-          @click="handleEdit(item)"
+          @click="assignment(item)"
         >
           mdi-pencil
         </v-icon>
       </template>
     </v-data-table>
+    <alert 
+      :type="alertType"
+      :visible="alertVisible"
+      :alertText="alertText"
+      @close="alertVisible = false"
+    />
   </div>
 </template>
 
@@ -41,11 +48,13 @@ import { mapActions, mapState } from 'vuex'
 import DeleteDialog from '@/components/delete_dialog'
 import DialogWrap from '@/components/dialog_wrap';
 import TableHeader from '@/components/table_header'
+import Alert from '@/components/alert.vue'
 export default {
   components: {
     DialogWrap,
     DeleteDialog,
-    TableHeader
+    TableHeader,
+    Alert
   },
   data: ()=> ({
     visible: false,
@@ -55,7 +64,7 @@ export default {
       { text: 'username', value: 'username' ,sortable: false ,align: 'start' },
       { text: 'E-mail', value: 'email', sortable: false  },
       { text: 'role', value: 'role' ,sortable: false},
-      { text: 'Actions', value: 'actions' , sortable: false},
+      { text: 'Actions', value: 'actions', align: 'end', sortable: false},
     ],
     options: {
       page: 1,
@@ -71,8 +80,20 @@ export default {
         value: '',
         label: 'email',
         type: 'input'
+      },
+      {
+        value: '',
+        label: 'role',
+        type: 'select',
+        multiple: true,
+        outerItems: true,
+        itemText: 'name',
+        itemValue: '_id'
       }
-    ]
+    ],
+    alertVisible: false,
+    alertType: '',
+    alertText: ''
   }),
   watch: {
     'options.page' () {
@@ -101,26 +122,36 @@ export default {
     ...mapActions([
       'getUserListAction',
     ]),
+    message (alertType, alertText) {
+      this.alertVisible = true
+      this.alertType = alertType
+      this.alertText = alertText
+      setTimeout(()=> {
+        this.alertVisible = false
+      }, 2000)
+    },
     query (isCreateOrDelete = false) {
       const { page=1, itemsPerPage=10 } = this.options
       console.log('page',page, 'itemsPerPage', itemsPerPage)
       this.getUserListAction({
         pageSize: isCreateOrDelete ? 10: itemsPerPage,
         pageNo: isCreateOrDelete? 1:  page
-      }).catch(err => console.log('err',err))
+      })
+        .catch(err => this.message('error', `Error: ${err.message}`))
     },
     search (options) {
       const query = {}
       options.forEach(item => {
         if(item.value) query[item.label] = item.value  
       })
-      this.getUserListAction(query).catch(err => console.log('err', err))
+      this.getUserListAction(query)
+        .catch(err => this.message('error', `Error: ${err.message}`))
     },
     computedRole(item) {
       return item.role.map(i =>  this.roleMap.get(i) )
     },
 
-    handleEdit(item){
+    assignment(item){
       console.log('--->',item)
     }
   }

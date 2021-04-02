@@ -79,6 +79,12 @@
       @close="deleteFormClose"
       @delete="deleteFormItem"
     />
+    <alert 
+      :type="alertType"
+      :visible="alertVisible"
+      :alertText="alertText"
+      @close="alertVisible = false"
+    />
   </div>
 </template>
 
@@ -87,11 +93,13 @@ import { mapActions, mapState } from 'vuex'
 import DeleteDialog from '@/components/delete_dialog'
 import DialogWrap from '@/components/dialog_wrap'
 import TableHeader from '@/components/table_header'
+import Alert from '@/components/alert.vue'
 export default {
   components: {
     DialogWrap,
     DeleteDialog,
-    TableHeader
+    TableHeader,
+    Alert
   },
   data: ()=> ({
     visible: false,
@@ -105,7 +113,7 @@ export default {
       { text: 'name', value: 'name',sortable: false, align: 'start' },
       { text: 'level', value: 'level' },
       { text: 'auth', value: 'auth' ,sortable: false, width: '70%'},
-      { text: 'Actions', value: 'actions', sortable: false },
+      { text: 'Actions', value: 'actions', align: 'end', sortable: false },
     ],
     options: {
       page: 1,
@@ -131,7 +139,10 @@ export default {
         itemText: 'code',
         itemValue: '_id'
       }
-    ]
+    ],
+    alertVisible: false,
+    alertType: '',
+    alertText: ''
   }),
   watch: {
     'options.page' (page) {
@@ -166,19 +177,29 @@ export default {
       'updateRoleAction',
       'deleteRoleAction'
     ]),
+    message (alertType, alertText) {
+      this.alertVisible = true
+      this.alertType = alertType
+      this.alertText = alertText
+      setTimeout(()=> {
+        this.alertVisible = false
+      }, 2000)
+    },
     search (options) {
       const query = {}
       options.forEach(item => {
         if(item.value) query[item.label] = item.value  
       })
-      this.getRoleAction(query).catch(err => console.log('err', err))
+      this.getRoleAction(query)
+        .catch(err => this.message('error', `Error: ${err.message}`))
     },
     query (isCreateOrDelete = false) {
       const { page=1, itemsPerPage=10 } = this.options
       this.getRoleAction({
         pageSize: isCreateOrDelete ? 10: itemsPerPage,
         pageNo: isCreateOrDelete? 1:  page
-      }).catch(err => console.log('err',err))
+      })
+        .catch(err => this.message('error', `Error: ${err.message}`))
     },
     computedCode (item) {
       return item.auth.map(i => this.codeMap.get(i))
@@ -203,11 +224,11 @@ export default {
       if (this.id === "") {
         this.createRoleAction({ name, level, auth })
           .then(_ => this.query(true))
-          .catch(err => console.log("err", err));
+          .catch(err => this.message('error', `Error: ${err.message}`))
       } else {
         this.updateRoleAction({ id: this.id, name, level, auth })
           .then(_ => this.query())
-          .catch(err => console.log("err", err));
+          .catch(err => this.message('error', `Error: ${err.message}`))
       }
       this.id = "";
       this.formTitle = "";
@@ -225,7 +246,7 @@ export default {
     deleteFormItem(){
       this.deleteRoleAction(this.deleteId)
         .then(_ => this.query(true))
-        .catch(err => console.log('err',err))
+        .catch(err => this.message('error', `Error: ${err.message}`))
       this.deleteFormClose()
     }
   }

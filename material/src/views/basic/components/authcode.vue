@@ -52,6 +52,12 @@
       @close="deleteFormClose"
       @delete="deleteFormItem"
     />
+    <alert 
+      :type="alertType"
+      :visible="alertVisible"
+      :alertText="alertText"
+      @close="alertVisible = false"
+    />
   </div>
 </template>
 
@@ -60,12 +66,15 @@ import { mapActions, mapState } from "vuex";
 import DeleteDialog from "@/components/delete_dialog"
 import DialogWrap from '@/components/dialog_wrap'
 import TableHeader from '@/components/table_header'
+import Alert from '@/components/alert.vue'
+
 export default {
   name: "authCode",
   components: {
     DialogWrap,
     DeleteDialog,
-    TableHeader
+    TableHeader,
+    Alert
   },
   data: () => ({
     visible: false,
@@ -76,9 +85,9 @@ export default {
     deleteId: "",
     items: ["PAGE", "FUNC"],
     headers: [
-      { text: "code",  value: "code", align: "start", sortable: false, width: '400'  },
+      { text: "code",  value: "code", align: "start", sortable: false,  width: 200 },
       { text: "type", value: "type", },
-      { text: "Actions", value: "actions", sortable: false }
+      { text: "Actions", value: "actions", align: "end", sortable: false }
     ],
     options: {
       page: 1,
@@ -96,7 +105,10 @@ export default {
         type: 'select',
         items: ['PAGE', 'FUNC']
       }
-    ]
+    ],
+    alertVisible: false,
+    alertType: '',
+    alertText: ''
   }),
 
   computed: {
@@ -121,19 +133,29 @@ export default {
       "updateAuthCodeAction",
       "deleteAuthCodeAction"
     ]),
+    message (alertType, alertText) {
+      this.alertVisible = true
+      this.alertType = alertType
+      this.alertText = alertText
+      setTimeout(()=> {
+        this.alertVisible = false
+      }, 2000)
+    },
     search (options) {
       const query = {}
       options.forEach(item => {
         if(item.value) query[item.label] = item.value  
       })
-      this.getAuthCodeAction(query).catch(err => console.log('err', err))
+      this.getAuthCodeAction(query)
+        .catch(err => this.message('error', `Error: ${err.message}`))
     },
     query (isCreateOrDelete = false) {
       const { page=1, itemsPerPage=10 } = this.options
       this.getAuthCodeAction({
         pageSize: isCreateOrDelete ? 10: itemsPerPage,
         pageNo: isCreateOrDelete? 1:  page
-      }).catch(err => console.log('err',err))
+      })
+        .catch(err => this.message('error', `Error: ${err.message}`))
     },
     handleCreate() {
       (this.visible = true), (this.formTitle = "Create Form");
@@ -154,11 +176,11 @@ export default {
       if (this.id === "") {
         this.createAuthCodeAction({ type, code })
           .then(_ => this.query(true))
-          .catch(err => console.log("err", err));
+          .catch(err => this.message('error', `Error: ${err.message}`))
       } else {
         this.updateAuthCodeAction({ id: this.id, type, code })
           .then(_ => this.query())
-          .catch(err => console.log("err", err));
+          .catch(err => this.message('error', `Error: ${err.message}`))
       }
       this.id = "";
       this.formTitle = "";
@@ -177,21 +199,11 @@ export default {
     deleteFormItem() {
       this.deleteAuthCodeAction(this.deleteId)
         .then(_ => this.query(true))
-        .catch(err => console.log("err", err));
+        .catch(err => this.message('error', `Error: ${err.message}`))
       this.deleteFormClose();
     }
   }
 };
 </script>
 <style lang='scss' scoped>
-// .v__header {
-//   display: flex;
-//   align-items: center;
-//   > button {
-//     margin-right: 40px;
-//   }
-//   > div {
-//     flex: 1;
-//   }
-// }
 </style>

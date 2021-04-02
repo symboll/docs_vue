@@ -69,6 +69,7 @@ const actions = {
         commit("SET_USER_LIST", res.data.users || [])
         commit("SET_USER_TOTAL", res.data.total)
         commit('SET_TABLE_LOADING', false)
+        resolve()
       }).catch(err => {
         commit('SET_TABLE_LOADING', false)
         reject(err.response.data)

@@ -20,7 +20,7 @@ export default [
       {
         path: 'basic',
         name: 'basic',
-        component: () => import('@/views/basic.vue')
+        component: () => import('@/views/basic/index.vue')
       }
     ]
   },

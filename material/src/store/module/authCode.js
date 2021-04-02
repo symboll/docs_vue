@@ -42,6 +42,7 @@ const actions = {
           commit('SET_AUTH_CODE', res.data.authcode || [])
           commit('SET_LIST_TOTAL', res.data.total)
         }
+        resolve()
       }).catch(err => {
         commit('SET_TABLE_LOADING', false)
         reject(err.response.data)

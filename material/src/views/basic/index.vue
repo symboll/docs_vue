@@ -40,15 +40,23 @@
         </v-card>
       </v-tab-item>
     </v-tabs-items>
+
+    <alert 
+      :type="alertType"
+      :visible="alertVisible"
+      :alertText="alertText"
+      @close="alertVisible = false"
+    />
   </v-card>
 </template>
 
 
 <script>
 import { mapActions } from 'vuex'
-import AuthCode from './authcode'
-import Role from './role'
-import User from './user'
+import AuthCode from './components/authcode'
+import Role from './components/role'
+import User from './components/user'
+import Alert from '@/components/alert.vue'
 export default {
   name: "basic",
   data: () =>({
@@ -62,11 +70,15 @@ export default {
     rules: [
       value => !value || value.size < 2000000 || 'Avatar size should be less than 2 MB!',
     ],
+    alertVisible: false,
+    alertType: '',
+    alertText: ''
   }),
   components: {
     AuthCode,
     Role,
-    User
+    User,
+    Alert
   },
   mounted() {
     this.init()
@@ -78,13 +90,24 @@ export default {
       'getUserListAction',
       "upLoadAction"
     ]),
+    message (alertType, alertText) {
+      this.alertVisible = true
+      this.alertType = alertType
+      this.alertText = alertText
+      setTimeout(()=> {
+        this.alertVisible = false
+      }, 2000)
+    },
     init () {
       const p = this.getAuthCodeAction()
       const q = this.getRoleAction()
       const r = this.getUserListAction()
-      Promise.allSettled([p, q, r]).then(res => {
+      Promise.all([p, q, r]).then(res => {
         console.log('res',res)
-      }).catch(err => { console.log('err ',err) })
+      }).catch(err => {
+        console.log('err-->', err)
+        this.message('error', `Error: ${err.message}`)
+      })
     },
     handleChange (e){
       const formData = new FormData()
@@ -92,7 +115,8 @@ export default {
 
       this.upLoadAction(formData).then(res => {
         console.log('res++', res)
-      }).catch(err => console.log('err', err))
+      })
+        .catch(err => this.message('error', `Error: ${err.message}`))
      
     }
   }
