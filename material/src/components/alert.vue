@@ -36,6 +36,10 @@ export default {
     type: {
       type: String,
       default: 'success'
+    },
+    delay: {
+      type: Number,
+      default: 2000
     }
   },
   mounted() {
@@ -43,7 +47,17 @@ export default {
   },
   methods: {
     close () {
-      this.$emit('close')
+      this.$emit('update:visible', false)
+    }
+  },
+  watch: {
+    visible (newVal, oldVal) {
+      const _this = this
+      if(newVal === true) {
+        setTimeout(()=> {
+          _this.close()
+        }, _this.delay)
+      }
     }
   }
 

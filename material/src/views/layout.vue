@@ -39,7 +39,7 @@
       <v-btn
         text
         outlined
-        @click="loginOut"
+        @click="logout"
       >
         <span class="mr-2">login out</span>
         <v-icon>mdi-power</v-icon>
@@ -76,7 +76,7 @@
 </template>
 
 <script>
-import { mapMutations, mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 export default {
   data () {
     return {
@@ -99,17 +99,16 @@ export default {
       avatar: state => state.user.avatar
     })
   },
-  methods: {
-    ...mapMutations([
-      'LOGOUT'
+  methods: {    
+    ...mapActions([
+      'logoutAction'
     ]),
-    
     handleClick (e) {
       if(this.$route.name == e.path) {return}
       this.$router.push(e.path)
     },
-    loginOut () {
-      this.LOGOUT()
+    logout () {
+      this.logoutAction()
       this.$router.push('/login')
     }
   }

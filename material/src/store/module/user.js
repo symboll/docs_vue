@@ -1,5 +1,4 @@
-import { login, register, getUserInfo, getUserList } from '@/api/user'
-import { setToken } from '@/util/token'
+import { login, logout, register, getUserInfo, getUserList } from '@/api/user'
 
 const state = {
   username: '',
@@ -19,7 +18,6 @@ const mutations = {
   LOGOUT (state) {
     state.username = ''
     state.avatar = ''
-    setToken('')
   },
   SET_USER_LIST(state, userList) {
     state.userList = userList
@@ -36,8 +34,17 @@ const actions = {
   loginAction: ({ commit }, { username, password }) => {
     return new Promise((resolve, reject) => {
       login({ username, password }).then(res => {
-        setToken(res.data)
         resolve()
+      }).catch(err => {
+        reject(err.response.data)
+      })
+    })
+  },
+  logoutAction: ({ commit })=> {
+    return new Promise((resolve, reject)=> {
+      logout().then(res => {
+        resolve()
+        commit('LOGOUT')
       }).catch(err => {
         reject(err.response.data)
       })

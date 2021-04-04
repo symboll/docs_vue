@@ -14,6 +14,7 @@
     <v-tabs-items v-model="tab" >
       <v-tab-item>
         <v-card flat>
+          
           <v-file-input
             :rules="rules"
             accept="image/png, image/jpeg, image/bmp"
@@ -45,7 +46,7 @@
       :type="alertType"
       :visible="alertVisible"
       :alertText="alertText"
-      @close="alertVisible = false"
+      :delay="delayTime"
     />
   </v-card>
 </template>
@@ -56,7 +57,6 @@ import { mapActions } from 'vuex'
 import AuthCode from './components/authcode'
 import Role from './components/role'
 import User from './components/user'
-import Alert from '@/components/alert.vue'
 export default {
   name: "basic",
   data: () =>({
@@ -72,13 +72,13 @@ export default {
     ],
     alertVisible: false,
     alertType: '',
-    alertText: ''
+    alertText: '',
+    delayTime: 2000
   }),
   components: {
     AuthCode,
     Role,
-    User,
-    Alert
+    User
   },
   mounted() {
     this.init()
@@ -94,18 +94,12 @@ export default {
       this.alertVisible = true
       this.alertType = alertType
       this.alertText = alertText
-      setTimeout(()=> {
-        this.alertVisible = false
-      }, 2000)
     },
     init () {
       const p = this.getAuthCodeAction()
       const q = this.getRoleAction()
       const r = this.getUserListAction()
-      Promise.all([p, q, r]).then(res => {
-        console.log('res',res)
-      }).catch(err => {
-        console.log('err-->', err)
+      Promise.all([p, q, r]).catch(err => {
         this.message('error', `Error: ${err.message}`)
       })
     },
@@ -114,7 +108,7 @@ export default {
       formData.append('file', e,  e.name)
 
       this.upLoadAction(formData).then(res => {
-        console.log('res++', res)
+        console.log('res==>', res)
       })
         .catch(err => this.message('error', `Error: ${err.message}`))
      

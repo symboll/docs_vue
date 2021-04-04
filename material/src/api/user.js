@@ -8,6 +8,13 @@ export const login = (data) => {
   })
 }
 
+export const logout = ()=> {
+  return axios.request({
+    url: 'user/logout',
+    method: "POST"
+  })
+}
+
 export const getUserInfo = () => {
   return axios.request({
     url: 'user/authorization',

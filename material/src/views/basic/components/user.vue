@@ -38,7 +38,7 @@
       :type="alertType"
       :visible="alertVisible"
       :alertText="alertText"
-      @close="alertVisible = false"
+      :delay="delayTime"
     />
   </div>
 </template>
@@ -48,13 +48,11 @@ import { mapActions, mapState } from 'vuex'
 import DeleteDialog from '@/components/delete_dialog'
 import DialogWrap from '@/components/dialog_wrap';
 import TableHeader from '@/components/table_header'
-import Alert from '@/components/alert.vue'
 export default {
   components: {
     DialogWrap,
     DeleteDialog,
-    TableHeader,
-    Alert
+    TableHeader
   },
   data: ()=> ({
     visible: false,
@@ -93,7 +91,8 @@ export default {
     ],
     alertVisible: false,
     alertType: '',
-    alertText: ''
+    alertText: '',
+    delayTime: 2000
   }),
   watch: {
     'options.page' () {
@@ -126,13 +125,9 @@ export default {
       this.alertVisible = true
       this.alertType = alertType
       this.alertText = alertText
-      setTimeout(()=> {
-        this.alertVisible = false
-      }, 2000)
     },
     query (isCreateOrDelete = false) {
       const { page=1, itemsPerPage=10 } = this.options
-      console.log('page',page, 'itemsPerPage', itemsPerPage)
       this.getUserListAction({
         pageSize: isCreateOrDelete ? 10: itemsPerPage,
         pageNo: isCreateOrDelete? 1:  page

@@ -56,7 +56,7 @@
       :type="alertType"
       :visible="alertVisible"
       :alertText="alertText"
-      @close="alertVisible = false"
+      :delay="delayTime"
     />
   </div>
 </template>
@@ -66,15 +66,13 @@ import { mapActions, mapState } from "vuex";
 import DeleteDialog from "@/components/delete_dialog"
 import DialogWrap from '@/components/dialog_wrap'
 import TableHeader from '@/components/table_header'
-import Alert from '@/components/alert.vue'
 
 export default {
   name: "authCode",
   components: {
     DialogWrap,
     DeleteDialog,
-    TableHeader,
-    Alert
+    TableHeader
   },
   data: () => ({
     visible: false,
@@ -108,7 +106,8 @@ export default {
     ],
     alertVisible: false,
     alertType: '',
-    alertText: ''
+    alertText: '',
+    delayTime: 2000
   }),
 
   computed: {
@@ -137,9 +136,6 @@ export default {
       this.alertVisible = true
       this.alertType = alertType
       this.alertText = alertText
-      setTimeout(()=> {
-        this.alertVisible = false
-      }, 2000)
     },
     search (options) {
       const query = {}

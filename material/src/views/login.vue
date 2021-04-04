@@ -92,14 +92,13 @@
       :type="alertType"
       :visible="visible"
       :alertText="alertText"
-      @close="visible = false"
+      :delay="delayTime"
     />
   </v-container>
 </template>
 
 <script>
 import { mapActions } from 'vuex'
-import Alert from '@/components/alert.vue'
 export default {
   data: () => ({
     valid: true,
@@ -129,14 +128,12 @@ export default {
     visible: false,
     alertType: "",
     alertText: "",
-    tab: null
+    tab: null,
+    delayTime: 2000
   }),
 
   computed: {
 
-  },
-  components: {
-    Alert
   },
   methods: {
     ...mapActions([
@@ -147,9 +144,6 @@ export default {
       this.visible = true
       this.alertType = alertType
       this.alertText = alertText
-      setTimeout(()=> {
-        this.visible = false
-      }, 2000)
     },
     handlerLogin () {
       if(this.$refs.loginform.validate()){
@@ -175,7 +169,6 @@ export default {
       }
     },
     tabsChange (e) {
-      console.log('tab==>',this.tab)
       if (e === 0 && !this.$refs.registerform) return
       switch (e) {
         case 0:
