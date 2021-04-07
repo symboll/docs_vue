@@ -108,8 +108,10 @@ export default {
       this.$router.push(e.path)
     },
     logout () {
-      this.logoutAction()
-      this.$router.push('/login')
+      this.logoutAction().then(_ => {
+        this.$router.push('/login')
+      })
+      
     }
   }
 }

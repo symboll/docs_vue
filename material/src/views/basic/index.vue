@@ -14,15 +14,36 @@
     <v-tabs-items v-model="tab" >
       <v-tab-item>
         <v-card flat>
-          
-          <v-file-input
-            :rules="rules"
-            accept="image/png, image/jpeg, image/bmp"
-            placeholder="Pick an avatar"
-            prepend-icon="mdi-camera"
-            label="Avatar"
-            @change="handleChange"
-          ></v-file-input>
+          <v-row>
+            <v-col cols="2" md="2" offset="1">
+              <v-avatar
+                color="accent"
+                size="128"
+              >
+                <img
+                  v-if="avatar && avatar !== ''"
+                  alt="Avatar"
+                  :src="avatar"
+                >
+                <span v-else>{{ username.slice(0,1) }}</span>
+              </v-avatar>
+            </v-col>
+            <v-col cols="2" md="2">
+              <v-file-input
+                :rules="rules"
+                accept="image/png, image/jpeg, image/bmp"
+                placeholder="Pick an avatar"
+                prepend-icon="mdi-camera"
+                label="Avatar"
+                @change="handleChange"
+              ></v-file-input>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="2" md="2">
+              <v-btn color="primary" @click="handleSubmit">更新</v-btn>
+            </v-col>
+          </v-row>
         </v-card>
       </v-tab-item>
       <v-tab-item>
@@ -44,7 +65,7 @@
 
     <alert 
       :type="alertType"
-      :visible="alertVisible"
+      :visible.sync="alertVisible"
       :alertText="alertText"
       :delay="delayTime"
     />
@@ -53,7 +74,7 @@
 
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import AuthCode from './components/authcode'
 import Role from './components/role'
 import User from './components/user'
@@ -62,7 +83,7 @@ export default {
   data: () =>({
     tab: null,
     items: [
-      '基本设置',
+      '我的主页',
       '用户',
       '角色',
       '权限码'
@@ -83,12 +104,20 @@ export default {
   mounted() {
     this.init()
   },
+    computed: {
+    ...mapState({
+      username: state => state.user.username,
+      avatar: state => state.user.avatar
+    })
+  },
   methods: {
     ...mapActions([
       'getAuthCodeAction',
       'getRoleAction',
       'getUserListAction',
-      "upLoadAction"
+      "upLoadAvatarAction",
+      "updateAction",
+      "authorizationAction"
     ]),
     message (alertType, alertText) {
       this.alertVisible = true
@@ -103,15 +132,31 @@ export default {
         this.message('error', `Error: ${err.message}`)
       })
     },
-    handleChange (e){
+    // handleChange (e){
+    //   const formData = new FormData()
+    //   formData.append('file', e,  e.name)
+
+    //   this.upLoadAvatarAction(formData)
+    //     .then(res => { 
+    //       // console.log('res==>', res)
+    //       this.updateAction({ avatar: res })
+    //      })
+    //     .catch(err => this.message('error', `Error: ${err.message}`))
+     
+    // },
+    async handleChange (e) {
       const formData = new FormData()
       formData.append('file', e,  e.name)
+      try {
+        const avatar = await this.upLoadAvatarAction(formData)
+        await this.updateAction({ avatar: avatar })
+        this.authorizationAction()
+      }catch(err) {
+        this.message('error', `Error: ${err.message}`)
+      }
+    },
+    handleSubmit () {
 
-      this.upLoadAction(formData).then(res => {
-        console.log('res==>', res)
-      })
-        .catch(err => this.message('error', `Error: ${err.message}`))
-     
     }
   }
 }

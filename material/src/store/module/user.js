@@ -1,4 +1,5 @@
-import { login, logout, register, getUserInfo, getUserList } from '@/api/user'
+import { login, logout, register, authorization, getUserList, update } from '@/api/user'
+import { upload } from '@/api/upload'
 
 const state = {
   username: '',
@@ -12,9 +13,9 @@ const mutations = {
   SET_USER_NAME (state, name) {
     state.username = name
   },
-  // SET_USER_AVATAR (state, params) {
-  //   state.avatar = params
-  // },
+  SET_USER_AVATAR(state, avatar) {
+    state.avatar = avatar
+  },
   LOGOUT (state) {
     state.username = ''
     state.avatar = ''
@@ -50,10 +51,11 @@ const actions = {
       })
     })
   },
-  authorization: ({ commit }) => {
+  authorizationAction: ({ commit }) => {
     return new Promise((resolve, reject) => {
-      getUserInfo().then(res => {
+      authorization().then(res => {
         commit('SET_USER_NAME', res.data.name)
+        commit('SET_USER_AVATAR', res.data.avatar)
         resolve()
       }).catch(err => {
         reject(err.response.data)
@@ -63,6 +65,15 @@ const actions = {
   registerAction: ({ commit}, data) =>  {
     return new Promise((resolve, reject)=> {
       register(data).then(_ => {
+        // resolve()
+      }).catch(err => {
+        reject(err.response.data)
+      })
+    })
+  },
+  updateAction: ({ commit }, data)=> {
+    return new Promise((resolve, reject)=> {
+      update(data).then(_ => {
         resolve()
       }).catch(err => {
         reject(err.response.data)
@@ -79,6 +90,19 @@ const actions = {
         resolve()
       }).catch(err => {
         commit('SET_TABLE_LOADING', false)
+        reject(err.response.data)
+      })
+    })
+  },
+  upLoadAvatarAction: ({ commit }, data) => {
+    return new Promise((resolve,reject)=> {
+      upload(data).then(res => {
+        if(res.url){
+          resolve(res.url)
+        }else {
+          reject('上传头像失败!')
+        } 
+      }).catch(err => {
         reject(err.response.data)
       })
     })

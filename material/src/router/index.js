@@ -12,7 +12,7 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  store.dispatch('authorization').then(() => {
+  store.dispatch('authorizationAction').then(() => {
     if (to.name === 'login') {
       next({ name: 'home' })
     } else { next() }

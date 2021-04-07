@@ -36,7 +36,7 @@
     </v-data-table>
     <alert 
       :type="alertType"
-      :visible="alertVisible"
+      :visible.sync="alertVisible"
       :alertText="alertText"
       :delay="delayTime"
     />

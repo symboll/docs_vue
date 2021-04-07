@@ -15,7 +15,7 @@ export const logout = ()=> {
   })
 }
 
-export const getUserInfo = () => {
+export const authorization = () => {
   return axios.request({
     url: 'user/authorization',
     method: 'GET',
@@ -26,6 +26,14 @@ export const register = (data) => {
   return axios.request({
     url: 'user/register',
     method: 'POST',
+    data
+  })
+}
+
+export const update = (data) => {
+  return axios.request({
+    url: 'user/update',
+    method: "POST",
     data
   })
 }
