@@ -68,8 +68,8 @@
       </v-card>
     </v-navigation-drawer>
     <v-main class="main_p10">
-      <keep-alive>
-        <router-view include='basic'/>
+      <keep-alive include='basic'>
+        <router-view />
       </keep-alive>
     </v-main>
   </v-app>

@@ -1,20 +1,29 @@
-import { login, logout, register, authorization, getUserList, update } from '@/api/user'
+import { login, logout, register, authorization, getUserList, update, getUserInfo } from '@/api/user'
 import { upload } from '@/api/upload'
 
 const state = {
   username: '',
   avatar: '',
+  email: '',
+  userId: '',
+  city: '',
+  sex: '',
+  role: [],
+  
   userList: [],
   loading: false,
   total: 0
 }
 
 const mutations = {
-  SET_USER_NAME (state, name) {
-    state.username = name
+  // only
+  SET_USER_BASIC_INFO (state, params) {
+    state.username = params.name
+    state.avatar = params.avatar
+    state.userId = params.id
   },
-  SET_USER_AVATAR(state, avatar) {
-    state.avatar = avatar
+  SET_BASIC_INFO (state, params) { 
+    state[params.key] = params.value 
   },
   LOGOUT (state) {
     state.username = ''
@@ -54,8 +63,7 @@ const actions = {
   authorizationAction: ({ commit }) => {
     return new Promise((resolve, reject) => {
       authorization().then(res => {
-        commit('SET_USER_NAME', res.data.name)
-        commit('SET_USER_AVATAR', res.data.avatar)
+        commit('SET_USER_BASIC_INFO', res.data)
         resolve()
       }).catch(err => {
         reject(err.response.data)
@@ -106,11 +114,70 @@ const actions = {
         reject(err.response.data)
       })
     })
+  },
+  getUserInfoAction : ({commit}, id)=> {
+    return new Promise((resolve, reject)=> {
+      getUserInfo(id).then(res => {
+        const info = ['sex','city', 'email', 'role']
+        for(let key of info) {
+          commit('SET_BASIC_INFO', { key, value: res.data[key] })
+        }
+        resolve(res.data)
+      }).catch(err => {
+        reject(err.response.data)
+      })
+    })
+  },
+  editUserBasicInfo : ({commit, state})=> {
+    const data = {
+      sex: state.sex,
+      city: state.city
+    }
+    return new Promise((resolve, reject)=> {
+      update(data).then(_ => {
+        resolve()
+      }).catch(err => {
+        reject(err.response.data)
+      })
+    })
   }
+}
+
+const getters = {
+  basicUserinfo: (state) => ([
+    { 
+      label: 'email', 
+      value: state.email,
+      type: 'v-text-field',
+      disabled: true
+    },
+    { 
+      label: 'role',
+      value: state.role,
+      type: 'v-select',
+      options: [],
+      disabled: true
+    },
+    { 
+      label: 'sex', 
+      value: state.sex,
+      type: 'v-select',
+      options: [
+        {label: '男', value: 'male'},
+        {label: '女', value: 'female'}
+      ],
+    },
+    { 
+      value: state.city,
+      label: 'city', 
+      type: 'v-text-field',
+    }
+  ])
 }
 
 export default {
   state,
   mutations,
+  getters,
   actions
 }

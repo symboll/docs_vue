@@ -15,7 +15,7 @@
       <v-tab-item>
         <v-card flat>
           <v-row>
-            <v-col cols="2" md="2" offset="1">
+            <v-col cols="3" md="3" class="avatar_wrap">
               <v-avatar
                 color="accent"
                 size="128"
@@ -27,20 +27,29 @@
                 >
                 <span v-else>{{ username.slice(0,1) }}</span>
               </v-avatar>
+                <v-file-input
+                  
+                  class="file_upload"
+                  outlined
+                  dense
+                  @change="handleChange"
+                ></v-file-input>
             </v-col>
-            <v-col cols="2" md="2">
-              <v-file-input
-                :rules="rules"
-                accept="image/png, image/jpeg, image/bmp"
-                placeholder="Pick an avatar"
-                prepend-icon="mdi-camera"
-                label="Avatar"
-                @change="handleChange"
-              ></v-file-input>
+            <v-col cols="4" md="4" >
+              <template v-for="item in basicUserinfo" >
+                <basic-info-edit
+                  :key="item.label"
+
+                  :disabled="item.disabled"
+                  :label="item.label"
+                  :type="item.type"
+                  :options="item.options"
+                />
+              </template>
             </v-col>
           </v-row>
           <v-row>
-            <v-col cols="2" md="2">
+            <v-col cols="2" md="2" offset="6">
               <v-btn color="primary" @click="handleSubmit">更新</v-btn>
             </v-col>
           </v-row>
@@ -74,10 +83,12 @@
 
 
 <script>
-import { mapActions, mapState } from 'vuex'
-import AuthCode from './components/authcode'
+import { mapActions, mapState, mapGetters } from 'vuex'
+import AuthCode from './components/auth_code'
 import Role from './components/role'
 import User from './components/user'
+import BasicInfoEdit from './components/basic_info_edit'
+import { constants } from 'fs';
 export default {
   name: "basic",
   data: () =>({
@@ -99,16 +110,21 @@ export default {
   components: {
     AuthCode,
     Role,
-    User
+    User,
+    BasicInfoEdit
   },
   mounted() {
     this.init()
   },
-    computed: {
+  computed: {
     ...mapState({
       username: state => state.user.username,
-      avatar: state => state.user.avatar
-    })
+      avatar: state => state.user.avatar,
+      userId: state => state.user.userId,
+    }),
+    ...mapGetters([
+      'basicUserinfo'
+    ])
   },
   methods: {
     ...mapActions([
@@ -117,7 +133,9 @@ export default {
       'getUserListAction',
       "upLoadAvatarAction",
       "updateAction",
-      "authorizationAction"
+      "authorizationAction",
+      "getUserInfoAction",
+      "editUserBasicInfo"
     ]),
     message (alertType, alertText) {
       this.alertVisible = true
@@ -128,22 +146,13 @@ export default {
       const p = this.getAuthCodeAction()
       const q = this.getRoleAction()
       const r = this.getUserListAction()
+      
       Promise.all([p, q, r]).catch(err => {
         this.message('error', `Error: ${err.message}`)
       })
+      this.getUserInfoAction(this.userId) 
+        .catch(err =>  this.message('error', `Error: ${err.message}`))
     },
-    // handleChange (e){
-    //   const formData = new FormData()
-    //   formData.append('file', e,  e.name)
-
-    //   this.upLoadAvatarAction(formData)
-    //     .then(res => { 
-    //       // console.log('res==>', res)
-    //       this.updateAction({ avatar: res })
-    //      })
-    //     .catch(err => this.message('error', `Error: ${err.message}`))
-     
-    // },
     async handleChange (e) {
       const formData = new FormData()
       formData.append('file', e,  e.name)
@@ -156,11 +165,40 @@ export default {
       }
     },
     handleSubmit () {
-
+      this.editUserBasicInfo()
+        .then(_ => this.message('success', '修改成功!'))
+        .catch(err => this.message('error', `Error: ${ err.message }`))
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+.avatar_wrap{
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: 30px;
+}
+
+.file_upload {
+  position: absolute;
+  top: 56px;
+  left: 114px;
+  opacity: 0;
+  ::v-deep .v-input__icon--prepend{
+    width: 90px !important;
+    height: 90px !important;
+  }
+  ::v-deep .v-icon.v-icon.v-icon--link {
+    height: 80px;
+    width: 80px !important;
+  }
+}
+::v-deep .v-text-field fieldset, .v-text-field .v-input__control{
+  display: none !important;
+}
 </style>
+

@@ -44,3 +44,9 @@ export const getUserList = (params) => {
     params
   })
 }
+
+export const getUserInfo = (id) => {
+  return axios.request({
+    url: `user/info/${id}`
+  })
+}
