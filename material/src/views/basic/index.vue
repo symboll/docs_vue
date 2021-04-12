@@ -197,8 +197,8 @@ export default {
     width: 80px !important;
   }
 }
-::v-deep .v-text-field fieldset, .v-text-field .v-input__control{
-  display: none !important;
-}
+// ::v-deep .v-text-field fieldset, .v-text-field .v-input__control{
+//   display: none !important;
+// }
 </style>
 

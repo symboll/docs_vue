@@ -16,12 +16,14 @@
     </div>
     <component 
       v-else
+      class="info_edit_form"
       :is="type" 
       v-model="value"
       :items="options"
       item-text="label"
       item-value='value'
       :disabled="disabled || view"
+      @blur="handleBlur"
     >
     </component>
     <div class="edit_icon" v-if="!disabled">
@@ -99,6 +101,9 @@ export default {
     finished () {
       this.view = true
     },
+    handleBlur () {
+      this.view = true
+    }
   }
 
 }
@@ -124,13 +129,15 @@ export default {
   }
 }
 
-::v-deep .v-input--is-disabled input,
-::v-deep .v-input--is-disabled .v-select__selections,
-::v-deep .v-select .v-select__selection--disabled {
-  color: rgba(0,0,0, 0.87) !important;
-}
+.info_edit_form {
+  ::v-deep .v-input--is-disabled input,
+  ::v-deep .v-input--is-disabled .v-select__selections,
+  ::v-deep .v-select .v-select__selection--disabled {
+    color: rgba(0,0,0, 0.87) !important;
+  }
 
-::v-deep .v-input__slot::before {
-  border-image: none !important;
+  ::v-deep .v-input__slot::before {
+    border-image: none;
+  }
 }
 </style>

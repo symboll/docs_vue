@@ -14,8 +14,8 @@
       :server-items-length="total"
     >
       <template v-slot:item.auth="{ item }">
-        <v-chip
-          v-for="i in computedCode(item)"
+        <v-chip 
+          v-for="i in item.auth" 
           :key="i.code"
           :color="i.type === 'FUNC'? 'primary': 'error'"
           dark
@@ -158,16 +158,6 @@ export default {
       total: state => state.role.total,
       loading: state => state.role.loading,
     }),
-    codeMap () {
-      const map = new Map()
-      this.authCodes.map(item => {
-        map.set(item._id, {
-          code: item.code,
-          type: item.type
-        })
-      })
-      return map
-    }
   },
   methods: {
     ...mapActions([
@@ -196,9 +186,6 @@ export default {
         pageNo: isCreateOrDelete? 1:  page
       })
         .catch(err => this.message('error', `Error: ${err.message}`))
-    },
-    computedCode (item) {
-      return item.auth.map(i => this.codeMap.get(i))
     },
     handleCreate() {
       this.visible = true

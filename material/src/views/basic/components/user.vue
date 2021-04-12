@@ -14,8 +14,8 @@
       :server-items-length="total"
     >
       <template v-slot:item.role="{ item }">
-        <v-chip
-          v-for="i in computedRole(item)"
+        <v-chip 
+          v-for="i in item.role" 
           :key="i.name"
           color="black32"
           dark
@@ -109,13 +109,6 @@ export default {
       total: state => state.user.total,
       loading: state => state.user.loading
     }),
-    roleMap () {
-      const map = new Map()
-      this.roles.map(item => {
-        map.set(item._id, { name: item.name })
-      })
-      return map
-    }
   },
   methods: {
     ...mapActions([
@@ -142,10 +135,6 @@ export default {
       this.getUserListAction(query)
         .catch(err => this.message('error', `Error: ${err.message}`))
     },
-    computedRole(item) {
-      return item.role.map(i =>  this.roleMap.get(i) )
-    },
-
     assignment(item){
       console.log('--->',item)
     }
