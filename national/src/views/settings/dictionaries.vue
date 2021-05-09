@@ -93,7 +93,7 @@
           <component 
             :is="item.type" 
             v-model="dictItemInfo[item.key]" 
-            :type="item.textarea? 'textarea': 'text'"
+            :type="item.childType ? item.childType : 'text'"
             :disabled="item.disabled"
             :clearable="item.clearable"
           >
@@ -130,7 +130,7 @@ export default {
         { label: '字典名称', key: 'name',  type: 'el-input', clearable: true },
         { label: '字典编码', key: 'code',  type: 'el-input', disabled: true, clearable: true },
         { label: '上级字典', key: 'ownDicType', type: 'el-select', option: "typeList", clearable: true },
-        { label: '属性描述', key: 'description',  type: 'el-input', textarea: true,  clearable: true },
+        { label: '属性描述', key: 'description',  type: 'el-input', childType:'textarea',  clearable: true },
       ],
       rules: {
         name: [{ required: true, message: '请输入字典名称', trigger: 'blur' },],

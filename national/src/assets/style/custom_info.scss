@@ -2,16 +2,8 @@
   padding: 16px 20px;
 }
 .c_header {
-  .title {
-    font: {
-      size: 16px;
-      weight: bold;
-      family: 'MicrosoftYaHei-Bold';
-    }
-    color: #333333;
-  }
-  .position_info {
-    padding: 20px 10px;
+  &_item_info {
+    padding: 0px 10px 20px;
     display: flex;
     flex-wrap: wrap;
     > div {
@@ -32,7 +24,20 @@
       }
       >div:nth-child(2) {
         flex: 1;
-        
+      }
+    }
+    .title {
+      width: 100% !important;
+      flex-shrink: 0;
+      > div {
+        color: #333333;
+        margin-left: -10px;
+        font: {
+          size: 16px !important;
+          weight: bold !important;
+          family: 'MicrosoftYaHei-Bold';
+        }
+        text-align: left !important;
       }
     }
   }

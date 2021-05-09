@@ -147,8 +147,6 @@ export default {
       policeList: state => state.policeList,
       statusList: state => state.positionStatusList,
 
-
-      
       statusMap: state => state.personal.statusMap,
       visitStatusMap: state => state.personal.visitStatusMap,
     })
@@ -168,7 +166,7 @@ export default {
       "getPoliceListAction",
     ]),
     ...mapMutations([
-      'SET_POSITION_ITEM'
+      "SET"
     ]),
 
     init () {
@@ -182,7 +180,7 @@ export default {
     },
 
     handleCreate () {
-      this.SET_POSITION_ITEM({})
+      this.SET({ module: "personal", key: "personalItem", value: {} })
       this.$router.push({ name: "EmphasisPersonalEdit" })
     },
 

@@ -135,17 +135,9 @@ export default {
     handleSubmit () {
       this.$refs['form'].validate((valid) => {
         if (valid) {
-
-          // const deptName = (this.psList.find(item => item.id === this.itemInfo.orgId) || {}).name
-          // const sysUserName = (this.policeList.find(item => item.id === this.itemInfo.sysUserId) || {}).name
-
-          // this.createOrUpdatePositionAction({
-          //   ...this.itemInfo,
-          //   deptName,
-          //   sysUserName
-          // })
-          //   .then(res => this.$message.success(this.itemInfo.id ?'修改成功!' : '创建成功！'))
-          //   .catch(err => this.$message.error(this.itemInfo.id ?'修改失败!' : '创建失败！'))
+          this.createOrUpdatePositionAction(this.itemInfo)
+            .then(res => this.$message.success(this.itemInfo.id ?'修改成功!' : '创建成功！'))
+            .catch(err => this.$message.error(this.itemInfo.id ?'修改失败!' : '创建失败！'))
         } else {
           return false;
         }

@@ -14,11 +14,7 @@ const state = {
   positionListTotal: 0,
   positionItem: {}
 }
-const mutations = {
-  SET_POSITION_ITEM (state, params) {
-    state.positionItem = params
-  }
-}
+const mutations = {}
 const actions = {
   getPositionListAction ({commit},params) {
     return new Promise((resolve, reject)=> {
@@ -35,7 +31,7 @@ const actions = {
     return new Promise((resolve, reject)=> {
       getDetailApi(type, id)
         .then(res => {
-          commit('SET_POSITION_ITEM', res.data) 
+          commit('SET', { module:"position", key: "positionItem", value: res.data })
         })
         .catch(err => reject(err))
     })

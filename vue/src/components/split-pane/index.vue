@@ -38,7 +38,7 @@ export default {
     }
   },
   data () {
-    return { 
+    return {
       canMove: false,
       triggerOffset: 0
     }

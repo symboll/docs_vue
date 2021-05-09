@@ -186,7 +186,7 @@ export default {
       "auditInfoSubmitAction"
     ]),
     ...mapMutations([
-      'SET_INFOSUBMIT_ITEM'
+      'SET'
     ]),
     computedStatus(status) {
       switch (status) {
@@ -205,7 +205,7 @@ export default {
     },
 
     handleCreate () {
-      this.SET_INFOSUBMIT_ITEM({})
+      this.SET({ module:"infoSubmit", key: "infoSubmitItem", value: {} })
       this.$router.push({ name: "InfoSubmitEdit" })
     },
 

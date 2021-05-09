@@ -1,11 +1,18 @@
 <template>
   <div class="c_wrap">
     <section class="c_header">
-      <div class="title">阵地信息</div>
-      <div class="position_info">
-        <div v-for="item in showInfoList" :key="item.key">
-          <div>{{ item.label }}</div>
-          <div>{{ itemInfo[item.key] }}</div>
+      <!-- <div class="title">阵地信息</div> -->
+      <div class="c_header_item_info">
+        <div v-for="item in showInfoList" :key="item.key" :class="{
+          'title': item.type === 'title'
+        }">
+          <template v-if="item.type ==='title'">
+            <div>{{ item.label }}</div>
+          </template>
+          <template v-else>
+            <div>{{ item.label }}</div>
+            <div>{{ itemInfo[item.key] }}</div>
+          </template>
         </div>
       </div>
     </section>
@@ -33,7 +40,10 @@
             :width="item.width"  
           >
             <template slot-scope="scope">
-              <template >
+              <template v-if="item.property ==='status'">
+                <span> {{ statusMap[scope.row['status']] }}</span>
+              </template>
+              <template v-else>
                 <span>{{ scope.row[item.property] }}</span>
               </template>
             </template>
@@ -44,7 +54,25 @@
           label="操作"
           width="200">
           <template slot-scope="scope">
-            <!-- <el-button
+            <template v-if="scope.row.status === 'init'">
+              <el-button
+                @click.native.prevent="handleAudit(scope.row)"
+                type="text"
+                size="small">
+                审核
+              </el-button>
+              <span> | </span>
+            </template>
+            <template v-if="scope.row.status === 'finish'">
+              <el-button
+                @click.native.prevent="handleEvaluate(scope.row)"
+                type="text"
+                size="small">
+                评价
+              </el-button>
+              <span> | </span>
+            </template>
+            <el-button
               @click.native.prevent="handleDetail(scope.row)"
               type="text"
               size="small">
@@ -63,7 +91,7 @@
               type="text"
               size="small">
               删除
-            </el-button> -->
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -79,22 +107,170 @@
         :total="total">
       </el-pagination>
     </section>
+    <c-t-dialog
+      :visible="visible"
+      :title="title"
+      confirmButtonText='保 存'
+      width="600px"
+      @confirm="handleConfirm"
+      @close="handleClose"
+    >
+       <el-form label-width="120px" :model="recordInfo" ref="form" :rules="rules">
+        <el-form-item 
+          v-for="item in createOrEditForm"
+          :key="item.key"
+          :label="item.label"
+          :prop="item.key"
+        >
+          <div v-if="item.type === 'div'" 
+            :class="{
+              'upload_wrap': item.key === 'upload',
+            }"
+          > 
+            <template v-if="item.key === 'upload'">
+              <template v-if="recordInfo.attachmentList && recordInfo.attachmentList.length > 0">
+                <div v-for="i in recordInfo.attachmentList" :key="i" class="upload_item">
+                  <el-tooltip  effect="dark" :content="i" placement="top-start">
+                    <a :href="i">
+                      <img 
+                        v-if="computedFormat(i) === 'img'"
+                        :src="i" alt=""
+                        class="img_style"
+                      >
+                      <video 
+                        v-else-if="computedFormat(i) === 'video'" 
+                        :src="i"  
+                        class="video_style"
+                      ></video>
+                      <i v-else class="el-icon-document-copy file_style"></i>
+                    </a>
+                  </el-tooltip>
+                </div>
+              </template>
+              <c-button flat iconType="daochu" class="file_upload_button">
+                <span>上传附件 <input type="file" @change="handleImport($event)"></span>
+              </c-button>
+            </template>
+          </div>
+          <component 
+            v-else
+            :is="item.type" 
+            v-model="recordInfo[item.key]" 
+            :type="item.childType ? item.childType : 'text'"
+            format="yyyy 年 MM 月 dd 日"
+            value-format="yyyy-MM-dd HH:mm:ss"
+          >
+            <template v-if="item.type === 'el-select'" >
+              <el-option v-for="item in computedOption(item.option)"
+                :key="item.id"
+                :value="item.code"
+                :label="item.name"
+              ></el-option>
+            </template>
+          </component>
+        </el-form-item>
+      </el-form>
+    </c-t-dialog>
+
+    <c-c-dialog
+      :visible="removeVisible"
+      @confirm="removeConfirm"
+      @close="removeClose"
+    ></c-c-dialog> 
+
+    <el-dialog
+      title="审核"
+      :visible.sync="auditVisible"
+      width="460px"
+    >
+      <section class="aduit_dialog_body">
+        <div class="title">审核意见</div>
+        <el-input 
+          type="textarea" 
+          v-model="auditInfo" 
+          placeholder="请输入"
+          :autosize="{ minRows: 4, maxRows: 8}"
+        ></el-input>
+        <div class="notes">注：若拒绝审批通过，需输入审核意见</div>
+      </section>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="handleResolveAudit">通 过</el-button>
+        <el-button @click="handleRejectAduit">返 回</el-button>
+      </span>
+    </el-dialog>
+
+
+    <c-t-dialog
+      :visible="infoVisible"
+      title="详情"
+      width="600px"
+      @confirm="infoClose"
+      @close="infoClose"
+    >
+      <section class="info_wrap">
+        <div v-for="item in createOrEditForm" :key="item.key">
+          <div class="title">{{ item.label }}</div>
+          <div class="value">
+            <template v-if="item.key !== 'upload'">
+              {{ recordInfo[item.key] }}
+            </template>
+            <template v-else>
+              <template v-if="recordInfo.attachmentList && recordInfo.attachmentList.length > 0">
+                <div v-for="i in recordInfo.attachmentList" :key="i" class="upload_item">
+                  <el-tooltip  effect="dark" :content="i" placement="top-start">
+                    <a :href="i">
+                      <img 
+                        v-if="computedFormat(i) === 'img'"
+                        :src="i" alt=""
+                        class="img_style"
+                      >
+                      <video 
+                        v-else-if="computedFormat(i) === 'video'" 
+                        :src="i"  
+                        class="video_style"
+                      ></video>
+                      <i v-else class="el-icon-document-copy file_style"></i>
+                    </a>
+                  </el-tooltip>
+                </div>
+              </template>
+            </template>
+          </div>
+        </div>
+      </section>
+    </c-t-dialog>
   </div>
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
+import { mapState, mapActions, mapMutations } from 'vuex'
 export default {
   data () {
     return {
-      list: [],
-      total: 0,
+      createOrEditForm: [
+        { label: '走访时间', key: 'recordTime', type: 'el-date-picker', childType: 'date' },
+        { label: '走访地点', key: 'address', type: 'el-input'},
+        { label: '被走访人', key: 'visitName',  type: 'el-input' },
+        { label: '场所情况评估', key: 'thoughtEvaluation', type: 'el-select', options: 'tEvaluationList' },
+        { label: '评价', key: 'evaluation', type: 'el-select', option: 'evaluationList'},
+        { label: '走访情况', key: 'remark', type: 'el-input', childType: 'textarea'  },
+        { label: "其他附件", key: 'upload', type: "div" , },
+      ],
+      rules: {
+        recordTime: [{ required: true, message: '请选选择走访时间', trigger: 'blur' },],
+        address: [{ required: true, message: '请输入走访地点', trigger: 'blur' },],
+        visitName: [{ required: true, message: '请输入被走访人', trigger: 'blur' },],
+        thoughtEvaluation: [{ required: true, message: '请选择场所情况评估', trigger: 'blur' },],
+        evaluation: [{ required: true, message: '请选择评价', trigger: 'blur' },],
+        remark: [{ required: true, message: '请输入走访情况', trigger: 'blur' },],
+      },
+
       tableHeader: [
-        { property: 'time', label: '走访时间', width: ''},
+        { property: 'recordTime', label: '走访时间', width: ''},
         { property: 'sysUserName', label: '走访民警', width: ''},
         { property: 'address', label: '走访地点', width: ''},
-        { property: 'owner', label: '被走访人', width: ''},
-        { property: 'name', label: '场所情况评估', width: ''},
+        { property: 'visitName', label: '被走访人', width: ''},
+        { property: 'thoughtEvaluation', label: '场所情况评估', width: ''},
         { property: 'status', label: '状态', width: ''},
       ],
       pagination: {
@@ -102,6 +278,7 @@ export default {
         pageSize: 10
       },
       showInfoList: [
+        { key: "title", label: "阵地信息", type: "title"},
         { key: "name", label: "阵地名称" },
         { key: "type", label: "种类" },
         { key: "cardNo", label: "登记证号" },
@@ -110,39 +287,269 @@ export default {
         { key: "orgId", label: "管辖单位" },
         { key: "sysUserId", label: "责任民警" },
         { key: "visitFrequency", label: "走访频率" },
+      ],
+      visible: false,
+      removeVisible: false,
+      auditVisible: false,
+      auditInfo: "",
+      auditId: 0,
+      title: '',
+      infoVisible: false,
+
+      optionlist: [
+        { typeCode: "场所情况评估", key: "tEvaluationList"  },
+        { typeCode: "评价", key: "evaluationList"  },
       ]
     }
   },
   mounted() {
     this.init()
+    this.searchFn()
   },
   computed: {
     ...mapState({
       itemInfo: state => state.position.positionItem,
+      list: state =>state.record.recordList,
+      total: state =>state.record.recordListTotal,
+
+      recordInfo: state => state.record.recordItem,
+      statusMap : state => state.record.statusMap,
+
+      tEvaluationList: state => state.tEvaluationList,
+      evaluationList: state => state.evaluationList
     })
   },
   methods: {
     ...mapActions([
-      'getPositionDetailAction'
+      'getPositionDetailAction',
+      'getRecordListAction',
+      'createOrUpdateRecordAction',
+      'removeRecordAction',
+      'auditRecordAction',
+      'getRecordDetailAction',
+      'commonUploadAction',
+      'getDicItemsAction'
     ]),
+    ...mapMutations([
+      'SET_RECORD_ITEM_ATTCH'
+    ]),
+    computedFormat(url) {
+      const imgPattern =  /\.(jpg|png|gif|jpeg)$/;
+      const videoPattern = /\.(mp4|avi|wmv|mov|mpeg|mpg|rm|ram|swf|flv)$/;
+
+      if(imgPattern.test(url)) return 'img'
+      else if(videoPattern.test(url)) return 'video'
+    },
     init () {
       const { id } = this.$route.query
       this.getPositionDetailAction(id)
         .catch(err => console.log(err))
+
+      this.optionlist.forEach(item => {
+        this.getDicItemsAction(item)
+          .catch(err => console.log(err))
+      })
+    },
+    searchFn () {
+      const { id } = this.$route.query
+      this.getRecordListAction({ 
+        ...this.pagination,
+        id, 
+        type: "position" 
+      })
+        .catch(err => console.log(err))
+    },
+    computedOption (option) {
+      switch (option) {
+        case 'tEvaluationList' : return this.tEvaluationList;
+        case 'evaluationList' : return this.evaluationList;
+        default: return [];
+      }
+    },
+    handleImport (event) {
+      if(event.target.files.length === 0) { return }
+      const formData = new FormData()
+      formData.append('file', event.target.files[0])
+      this.commonUploadAction(formData)
+        .then(res => this.SET_RECORD_ITEM_ATTCH(res))
+        .catch(err => this.$message.error('上传失败' + err))
     },
     handleCreate () {
+      this.visible = true
+      this.title = '创建'
+    },
+    handleConfirm () {
+      this.$refs['form'].validate((valid) => {
+        if (valid) {
+          const joinId = this.$route.query.id
+          this.createOrUpdateRecordAction({
+            ...this.recordInfo,
+            joinId,
+            type: "position"
+          })
+            .then(res => {
+              this.visible = false
+              this.title = ''
+              this.$message.success(this.recordInfo.id ? '修改成功!':'修改成功！')
+              this.searchFn()
+            })
+            .catch(err => this.$message.error(this.recordInfo.id ? '修改失败！'+ err  : '创建失败！' + err))
+        } else {
+          this.$message.error('请输入全部信息后，提交!')
+          return false;
+        }
+      })
+    },
+    handleClose () {
+      this.visible = false
+      this.title = ''
+    },
+    handleSizeChange (val) {
+      this.pagination.pageSize = val
+      this.searchFn()
+    },
+    handleCurrentChange (val) {
+      this.pagination.pageNo = val
+      this.searchFn()  
+    },
+    handleAudit (row) {
+      this.auditId = row.id
+      this.auditVisible = true
+    },
+    handleResolveAudit () {
+      const param = {
+        auditInfo: this.auditInfo,
+        id: this.auditId,
+        isPass: true,
+        type: 'position'
+      }
+      this.auditRecordAction(param)
+        .then(_ => {
+          this.auditInfo = ''
+          this.auditId = 0
+          this.auditVisible = false
+          this.searchFn()
+        })
+        .catch(err => console.log(err))
+    },
+    handleRejectAduit () {
+      if(this.auditInfo === '') {
+        this.$message.error('拒绝审批通过，需输入审核意见')
+        return
+      }
+      const param  = {
+        auditInfo: this.auditInfo,
+        id: this.auditId,
+        isPass: false,
+        type: 'position'
+      }
+      this.auditRecordAction(param)
+        .then(_ => {
+          this.auditInfo = ''
+          this.auditId = 0
+          this.auditVisible = false
+          this.searchFn()
+        })
+        .catch(err => console.log(err))
+    },
+    handleEvaluate (row) {
 
     },
-    handleSizeChange () {
 
+    handleDetail (row) {
+      this.getRecordDetailAction({ id: row.id, type: "position"})
+        .then(_ =>  this.infoVisible = true )
     },
-    handleCurrentChange () {
+    infoClose () {
+      this.infoVisible = false
+    },
 
-    }
+    handleEdit (row) {
+      this.getRecordDetailAction({ id: row.id, type: "position"})
+        .then(res => {
+          this.visible = true
+          this.title = '编辑'
+        })
+    },
+    handleRemove (row) {
+      this.removeId =  row.id
+      this.removeVisible = true
+    },
+    removeClose () {
+      this.removeVisible = false
+    },
+    removeConfirm () {
+      if(this.removeId !== 0) {
+        this.removeRecordAction(this.removeId)
+          .then(_ => {
+            this.removeVisible = false
+            this.searchFn()
+          })
+      }
+    },
   }
 }
 
 </script>
 <style lang="scss" scoped>
   @import '@/assets/style/custom_info.scss';
+  @import '@/assets/style/file_upload_button.scss';
+  .upload_wrap {
+    display: flex;
+    align-items: center;
+    .upload_item {
+      margin-right: 20px;
+      .file_style {
+        font-size: 40px;
+        color: #909399;
+      }
+      .img_style{
+        width: 80px;
+        height: 80px;
+
+      }
+      .video_style {
+        width: 160px;
+        height: 160px;
+      }
+    }
+  }
+
+.info_wrap {
+  display: flex;
+  flex-direction: column;
+  > div {
+    display: flex;
+    min-height: 34px;
+    margin-bottom: 10px;
+    > div:nth-child(1) {
+      flex-basis: 100px;
+      flex-shrink: 0;
+      margin-right: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+    > div:nth-child(2) {
+      display: flex;
+      align-items: center;
+      .upload_item {
+        margin-right: 20px;
+        .file_style {
+          font-size: 40px;
+          color: #909399;
+        }
+        .img_style{
+          width: 80px;
+          height: 80px;
+
+        }
+        .video_style {
+          width: 160px;
+          height: 160px;
+        }
+      }
+    }
+  }
+}
 </style>

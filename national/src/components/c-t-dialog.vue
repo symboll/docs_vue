@@ -10,7 +10,7 @@
     >
       <slot></slot>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="handleConfirm">确 定</el-button>
+        <el-button type="primary" @click="handleConfirm">{{ confirmButtonText }}</el-button>
         <el-button @click="handleCancel">取 消</el-button>
       </span>
     </el-dialog>
@@ -23,6 +23,10 @@ export default {
     return {}
   },
   props: {
+    confirmButtonText: {
+      type: String,
+      default: "确 定"
+    },
     title: {
       type:String,
       required: true

@@ -57,21 +57,12 @@
             value-format="yyyy-MM-dd HH:mm:ss"
             @change="handleChange(item.key, itemInfo[item.key])"
           >            
-            <template v-if="item.option && (item.key === 'orgId' || item.key === 'sysUserId')">
+            <template v-if="item.option">
               <el-option 
                 v-for="cur in computedList(item.option)"
                 :key="cur.id"
                 :label="cur.name"
                 :value="cur.id"
-              />
-            </template>
-
-            <template v-if="item.option && (item.key === 'infoSource')">
-              <el-option 
-                v-for="cur in computedList(item.option)"
-                :key="cur"
-                :label="cur"
-                :value="cur"
               />
             </template>
           </component>
@@ -137,7 +128,8 @@ export default {
       'createOrUpdateInfoSubmitAction',
       'getInfoSubmitDetailAction',
 
-      'commonUploadAction'
+      'commonUploadAction',
+      'getDicItemsAction'
     ]),
     ...mapMutations([
       'SET_INFO_SUBMIT_ITEM_ATTCH'
@@ -171,6 +163,9 @@ export default {
         this.getPoliceStationListAction()
           .catch(err => console.log(err))
       }
+
+      this.getDicItemsAction({ typeCode: "信息来源", key: "infoSourceList"  })
+        .catch(err => console.log(err))
     },
     computedList (option) {
       switch (option) {
@@ -188,18 +183,20 @@ export default {
         .then(res => this.SET_INFO_SUBMIT_ITEM_ATTCH(res))
         .catch(err => this.$message.error('上传失败' + err))
     },
-    handleChange (key, value) {
-      if (key === 'orgId' && value !== '') {
-        this.getPoliceListAction(value)
+    handleChange (key, id) {
+      if (key === 'orgId' && id !== '') {
+        this.getPoliceListAction(id)
           .catch(err => console.log(err))
       }
 
-      if(key === 'infoSource' && value !== '') {
-        if(value === '信息员上报'){
-          this.createOrEditForm.splice(1,1, 
+      if(key === 'infoSource' && id !== '') {
+        const name = (this.infoSourceList.find(item => item.id === id) || {}).name
+        console.log(name)
+        if(name === '情报员上报'){
+          this.createOrEditForm.splice(2,1, 
             { label: '信息员编号', key: 'personNo', type: 'el-input'})
-        } else if (value === '非信息员上报') {
-          this.createOrEditForm.splice(1,1, 
+        } else if (name === '非情报员上报') {
+          this.createOrEditForm.splice(2,1, 
             { label: '信息员编号', key: 'personNo', type: 'el-input' , inithide: true})
         }
       }
@@ -213,12 +210,14 @@ export default {
 
           const deptName = (this.psList.find(item => item.id === this.itemInfo.orgId) || {}).name
           const sysUserName = (this.policeList.find(item => item.id === this.itemInfo.sysUserId) || {}).name
+          const infoSource = (this.infoSourceList.find(item => item.id === this.itemInfo.infoSource) || {}).name
 
           this.createOrUpdateInfoSubmitAction({
             ...this.itemInfo,
             infoBody: this.editorData || "",
             deptName,
-            sysUserName
+            sysUserName,
+            infoSource
           })
             .then(res => this.$message.success(this.itemInfo.id ?'修改成功!' : '创建成功！'))
             .catch(err => this.$message.error(this.itemInfo.id ?'修改失败!' : '创建失败！'))

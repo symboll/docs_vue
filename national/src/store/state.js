@@ -3,11 +3,12 @@ export default {
   policeList: [],
   useDirectionList: [],
   visitFrequencyList: [],
+  zoneList: [],
+  organTypeList: [],
+  personTypeList:[],
+  personLevelList:[],
   typeList: [],
-  infoSourceList: [
-    '信息员上报',
-    '非信息员上报'
-  ],
+  infoSourceList: [],
   statusList: [
     {
       id: 1,
@@ -82,4 +83,7 @@ export default {
       status: 'finish'
     },
   ],
+
+  evaluationList:[],
+  tEvaluationList: []
 }

@@ -193,7 +193,7 @@ export default {
       "infoOfficerImportAction"
     ]),
     ...mapMutations([
-      'SET_INFOOFFICER_ITEM'
+      'SET'
     ]),
     computedStatus(status,reportFlag) {
       const item = this.statusList.find(item => item.status === status && item.reportFlag === reportFlag)
@@ -211,7 +211,7 @@ export default {
     },
 
     handleCreate () {
-      this.SET_INFOOFFICER_ITEM({})
+      this.SET({module: "infoOfficer", key: "infoOfficerItem", value: {} })
       this.$router.push({ name: "InfoOfficerEdit" })
     },
 

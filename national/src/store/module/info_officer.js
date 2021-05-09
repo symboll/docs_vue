@@ -14,11 +14,7 @@ const state = {
   infoOfficerTotal: 0,
   infoOfficerItem: {}
 }
-const mutations = {
-  SET_INFOOFFICER_ITEM (state, params) {
-    state.infoOfficerItem = params
-  }
-}
+const mutations = {}
 const actions = {
   getInfoOfficerListAction ({ commit }, params={}) {
     return new Promise((resolve, reject)=> {
@@ -31,7 +27,7 @@ const actions = {
   getInfoOfficerDetailAction ({ commit }, id) {
     return new Promise((resolve, reject) => {
       getDetailApi(type, id)
-        .then(res => commit('SET_INFOOFFICER_ITEM', res.data))
+        .then(res => commit('SET', { module:"infoOfficer", key: "infoOfficerItem", value: res.data }))
         .catch(err => reject(err))
     })
   },

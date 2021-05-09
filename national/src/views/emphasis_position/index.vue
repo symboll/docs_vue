@@ -143,7 +143,7 @@ export default {
       "getPoliceListAction",
     ]),
     ...mapMutations([
-      'SET_POSITION_ITEM'
+      'SET'
     ]),
 
     init () {
@@ -157,7 +157,7 @@ export default {
     },
 
     handleCreate () {
-      this.SET_POSITION_ITEM({})
+      this.SET({ module: "position", key: "positionItem", value: {} })
       this.$router.push({ name: "EmphasisPositionEdit" })
     },
 

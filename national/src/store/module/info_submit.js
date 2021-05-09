@@ -16,12 +16,9 @@ const state = {
   }
 }
 const mutations = {
-  SET_INFOSUBMIT_ITEM (state, params) {
-    state.infoSubmitItem = params
-  },
   SET_INFO_SUBMIT_ITEM_ATTCH (state, file) {
     if(!state.infoSubmitItem.attachmentList) {
-      infoSubmitItem.attachmentList = []
+      state.infoSubmitItem.attachmentList = []
     }
     state.infoSubmitItem.attachmentList.push(file)
   }
@@ -60,7 +57,7 @@ const actions = {
     return new Promise((resolve, reject)=> {
       getDetailApi(type, id)
         .then(res => {
-          commit('SET_INFOSUBMIT_ITEM', res.data) 
+          commit('SET', { module:"infoSubmit", key: "infoSubmitItem", value: res.data })
           resolve(res.data)
         })
         .catch(err => reject(err))
