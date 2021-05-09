@@ -1,0 +1,27 @@
+.c_wrap{
+  padding: 16px 20px;
+}
+.c_header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  > div {
+    margin-left: 10px;
+  }
+  > span {
+    font: {
+      size: 16px;
+      weight: bold;
+      family: 'MicrosoftYaHei-Bold';
+    }
+    color: #333333;
+  }
+}
+.c_body {
+  margin-left: -20px;
+  margin-right: -20px;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 116px);
+  justify-content: space-between;
+}

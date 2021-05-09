@@ -1,0 +1,51 @@
+.c_pagination {
+  background-color: rgb(242,247,254);
+  // margin-top: 10px;
+  display: flex;
+  height: 40px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.c_table {
+  color: #3F4247;
+  font: {
+    size: 14px;
+    family: 'PingFangSC-Regular';
+  }
+}
+.el-table thead { 
+  background-color: rgb(242,247,254);
+  color: #3F4247;
+  font: {
+    size: 14px;
+    family: 'PingFangSC-Semibold';
+    weight: bold;
+  }
+}
+.el-table th{
+  height: 60px;
+  background-color: rgb(242,247,254);
+}
+
+.el-table tr{
+  height: 40px;
+}
+
+
+.c_red {
+  color: #F56C6C;
+}
+.c_green {
+  color: #67C23A;
+}
+.c_grey {
+  color: #909399;
+}
+
+.mr_16{
+  margin-right: 16px;
+}
+.c_btn {
+  padding: 7px 16px !important;
+}
