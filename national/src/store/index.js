@@ -12,6 +12,7 @@ import record from './module/record'
 import user from './module/user'
 import role from './module/role'
 import params from './module/params'
+import statistical from './module/statistical'
 import dictionaries from './module/dictionaries'
 import infoOfficer from './module/info_officer'
 import infoSubmit from './module/info_submit'
@@ -32,7 +33,8 @@ export default new Vuex.Store({
     params,
     dictionaries,
     infoOfficer,
-    infoSubmit
+    infoSubmit,
+    statistical
   },
   plugins: [
     plugin

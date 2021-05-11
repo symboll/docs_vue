@@ -19,6 +19,7 @@
 
 <script>
 import SideBarItem from './sidebar_item'
+import { mapState } from 'vuex'
 export default {
   components: {
     SideBarItem
@@ -30,6 +31,16 @@ export default {
       routes: this.$router.options.routes[0].children
     };
   },
+  computed:{
+    ...mapState({
+      // currentUser: state => state.user.currentUser || {}
+    }),
+  },
+  watch:{
+    '$route.path' (newV, oldV) {
+      this.route = newV
+    }
+  },
   methods: {
     handleOpen(key, keyPath) {
       console.log(key, keyPath);
@@ -37,7 +48,7 @@ export default {
     handleClose(key, keyPath) {
       console.log(key, keyPath);
     }
-  }
+  },
 }
 
 </script>

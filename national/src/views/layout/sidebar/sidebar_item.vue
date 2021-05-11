@@ -2,7 +2,7 @@
   <div>
     <template v-for="item in routes">
       <el-submenu 
-        v-if="item.children && item.children.length > 0"
+        v-if="item.children && item.children.length > 0 && (currentUser.authCodeList || []).includes(item.name)"
         :key="item.path" 
         :index="item.path"
       >
@@ -15,10 +15,10 @@
         />
       </el-submenu>
       <el-menu-item  
-        v-else-if="item.meta && !item.meta.hide"
+        v-else-if="item.meta && !item.meta.hide && (currentUser.authCodeList || []).includes(item.name)"
         :key="item.path"
         :index="prefix === '' ? item.path: prefix +'/'+ item.path"
-      >
+      > 
         <img class="c_icon_left" v-if="item.meta&& item.meta.icon" :src="item.meta.icon" alt="">
         <span slot="title">{{ item.meta? item.meta.title: "" }}</span>
       </el-menu-item>
@@ -27,6 +27,8 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
+import { constants } from 'fs';
 export default {
   name: "SidebarItem",
   props: {
@@ -38,6 +40,13 @@ export default {
       type: String,
       default: ''
     }
+  },
+  computed: {
+    ...mapState({
+      currentUser: state => state.user.currentUser
+    })
+  },
+  mounted() {
   },
 };
 </script>

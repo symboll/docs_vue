@@ -1,7 +1,6 @@
 
 import { setToken } from '@/lib/util'
-
-import { login } from '@/api/login'
+import { login, modifyPassword } from '@/api/login'
 import { 
   getCurOrgTreeApi, 
   getUserListApi ,
@@ -35,6 +34,13 @@ const actions = {
         resolve()
       })
       .catch(err => reject(err))
+    })
+  },
+  modifyPasswordApi ({commit}, data) {
+    return new Promise((resolve, reject) => {
+      modifyPassword(data)
+        .then(res => resolve(res))
+        .catch(err => reject(err))
     })
   },
   getCurOrgTreeAction ({ commit},params) {
@@ -89,6 +95,7 @@ const actions = {
     return new Promise((resolve, reject)=> {
       getCurrentUserInfoApi().then(res => {
         commit('SET', { module: "user", key: "currentUser", value: res.data })
+        resolve(res.data)
       })
         .catch(err => reject(err))
     })
@@ -121,7 +128,17 @@ const actions = {
     })
   },
 }
-const getters = {}
+const getters = {
+  buttonList: (state) => (pageName) => {
+    const pattern = new RegExp(pageName)
+    const authCodeList = state.currentUser?.authCodeList
+    const res = authCodeList.filter(item => pattern.test(item)).map(item => {
+      const arr = item.split(':')
+      return arr[1]
+    }).filter(i => i)
+    return res
+  },
+}
 
 export default{
   state,

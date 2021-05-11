@@ -6,6 +6,7 @@ import {
   auditApi,
   // importApi
 } from '@/api/template'
+import { exportApi }  from '../../api/common'
 
 const type = 'position'
 
@@ -59,6 +60,13 @@ const actions = {
         .catch(err => reject(err))
     })
   },
+  exportAction({commit}, params) {
+    return new Promise((resolve,reject) => {
+      exportApi(params)
+        .then(res => resolve(res))
+        .catch(err => reject(err))
+    })
+  }
 }
 const getters = {}
 

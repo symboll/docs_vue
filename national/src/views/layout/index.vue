@@ -31,13 +31,14 @@ export default {
   },
   methods: {
     ...mapActions([
-      'getUserInfoAction',
-      'getRoutersAction'
-    ])
+      'getCurrentUserInfoAction'
+    ]),
+    init () {
+      this.getCurrentUserInfoAction()
+    },
   },
   mounted() {
-    // this.getUserInfoAction()
-    // this.getRoutersAction()
+    this.init()
   },
 };
 </script>

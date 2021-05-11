@@ -27,6 +27,7 @@
           width="200">
           <template slot-scope="scope">
             <el-button
+              v-if="buttonList('params').includes('edit')"
               @click.native.prevent="handleEdit(scope.row)"
               type="text"
               size="small">
@@ -74,7 +75,7 @@
 </template>
 
 <script>
-import { mapState, mapActions, mapMutations } from 'vuex'
+import { mapState, mapActions, mapMutations,mapGetters } from 'vuex'
 export default {
   data() {
     return {
@@ -102,7 +103,10 @@ export default {
       list: state => state.params.systemConfigList,
       total: state => state.params.systemConfigListTotal,
       itemInfo: state => state.params.paramsItemInfo
-    })
+    }),
+    ...mapGetters([
+      'buttonList'
+    ])
   },
   methods: {
     ...mapActions([

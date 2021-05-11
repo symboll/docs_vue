@@ -239,6 +239,7 @@
         </div>
       </section>
     </c-t-dialog>
+    
   </div>
 </template>
 
@@ -251,7 +252,7 @@ export default {
         { label: '走访时间', key: 'recordTime', type: 'el-date-picker', childType: 'date' },
         { label: '走访地点', key: 'address', type: 'el-input'},
         { label: '被走访人', key: 'visitName',  type: 'el-input' },
-        { label: '场所情况评估', key: 'thoughtEvaluation', type: 'el-select', options: 'tEvaluationList' },
+        { label: '场所情况评估', key: 'thoughtEvaluation', type: 'el-select', option: 'tEvaluationList' },
         { label: '评价', key: 'evaluation', type: 'el-select', option: 'evaluationList'},
         { label: '走访情况', key: 'remark', type: 'el-input', childType: 'textarea'  },
         { label: "其他附件", key: 'upload', type: "div" , },

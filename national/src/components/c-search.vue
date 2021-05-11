@@ -13,8 +13,8 @@
             :is="item.type" 
             v-model="item.value" 
             :type="item.datePickerType" 
-            format="yyyy 年 MM 月 dd 日"
-            value-format="yyyy-MM-dd"
+            :format="item.format ? item.format:'yyyy 年 MM 月 dd 日'"
+            :value-format="item.valueFormat ? item.valueFormat: 'yyyy-MM-dd'"
             :clearable="item.clearable"
             @change="handleChange(item.key,item.value)"
           >
@@ -41,7 +41,7 @@
               />
             </template>
 
-            <template v-if="item.option && item.key === 'status'">
+            <template v-if="item.option && (item.key === 'status'  || item.key === 'taskType')">
               <el-option 
                 v-for="cur in computedList(item.option)"
                 :key="cur.id"
@@ -88,6 +88,10 @@ export default {
     statusList: {
       type: Array,
       default: () => []
+    },
+    taskTypeList: {
+      type: Array,
+      default: () => []
     }
   },
   methods: {
@@ -100,6 +104,7 @@ export default {
         case 'policeList': return this.policeList;
         case 'useDirList': return this.useDirList;
         case 'statusList': return this.statusList;
+        case "taskTypeList": return this.taskTypeList;
         default: return [];
       }
     },

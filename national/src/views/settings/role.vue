@@ -1,9 +1,11 @@
 <template>
   <div class="c_wrap">
+
     <aside class="c_sidebar">
       <header class="c_sidebar_header">
         <span>角色配置</span>
-        <c-button flat iconType="ic_xinzeng" @click="handleCreateRole">
+        <c-button v-if="buttonList('role').includes('add')" 
+          flat iconType="ic_xinzeng" @click="handleCreateRole">
           <span>新增</span>
         </c-button>
       </header>
@@ -23,13 +25,13 @@
       <header class="role_header">
         <div>{{ selectedRoleName }}</div>
         <c-button 
-          v-if="selectedRoleId"
+          v-if="selectedRoleId && buttonList('role').includes('edit')"
           round iconType="ic_bianji"  @click="handleEdit">
           <span>编辑</span>
         </c-button>
 
         <el-button 
-          v-if="selectedRoleId"
+          v-if="selectedRoleId && buttonList('role').includes('del')"
           round
           type="primary" 
           icon="el-icon-delete" 
@@ -61,7 +63,7 @@
 
 <script>
 import RoleDetail from './role_detail'
-import { mapActions, mapState,mapMutations } from 'vuex'
+import { mapActions, mapState,mapMutations, mapGetters } from 'vuex'
 export default {
   name: "role",
   components: {
@@ -81,6 +83,9 @@ export default {
       selectedRoleName: state => state.role.selectedRoleName,
       selectedIds: state => state.role.selectedIds
     }),
+    ...mapGetters([
+      'buttonList'
+    ]),
     selectedRolePackaged () {
       const leng = this.selectedRole.length % 3 
       switch (leng) {

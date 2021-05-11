@@ -20,7 +20,7 @@
     <section class="c_body">
       <header class="c_header">
         <div class="title">字典列表</div>
-        <c-button flat iconType="ic_xinzeng" @click="handleCreate"> 
+        <c-button v-if="buttonList('dictionaries').includes('add')" flat iconType="ic_xinzeng" @click="handleCreate"> 
           <span>新增</span>
         </c-button>
       </header>
@@ -50,14 +50,17 @@
           label="操作"
           width="200">
           <template slot-scope="scope">
+            <template v-if="buttonList('dictionaries').includes('edit')">
+              <el-button 
+                @click.native.prevent="handleEdit(scope.row)"
+                type="text"
+                size="small">
+                编辑
+              </el-button>
+              <span> | </span>
+            </template>
             <el-button
-              @click.native.prevent="handleEdit(scope.row)"
-              type="text"
-              size="small">
-              编辑
-            </el-button>
-            <span> | </span>
-            <el-button
+            v-if="buttonList('dictionaries').includes('del')"
               @click.native.prevent="handleRemove(scope.row)"
               type="text"
               size="small">
@@ -116,7 +119,7 @@
   </div>
 </template>
 <script>
-import { mapActions, mapState, mapMutations } from 'vuex'
+import { mapActions, mapState, mapMutations, mapGetters } from 'vuex'
 export default {
   name: "dictionaries",
   data() {
@@ -157,7 +160,10 @@ export default {
       list: state => state.dictionaries.dictItemList,
       total: state => state.dictionaries.dictItemTotal,
       dictItemInfo: state => state.dictionaries.dictItemInfo
-    })
+    }),
+    ...mapGetters([
+      'buttonList'
+    ])
   },
   methods: {
     ...mapActions([

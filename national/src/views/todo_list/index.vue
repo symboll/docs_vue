@@ -1,5 +1,6 @@
 <template>
   <div class="c_wrap">
+    <!-- buttonList('TodoList') -->
     <header class="c_header"><span>代办事项列表</span></header>
     <section class="c_body">
       <el-table
@@ -66,7 +67,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapState, mapGetters } from 'vuex'
 export default {
   data (){
     return {
@@ -86,7 +87,10 @@ export default {
     ...mapState({
       list: state => state.todoList.todoList,
       total: state => state.todoList.todoListTotal,
-    })
+    }),
+    ...mapGetters([
+      'buttonList'
+    ])
   },
   methods: {
     ...mapActions([
@@ -127,7 +131,9 @@ export default {
     },
 
     handleView (row) {
-      console.log('row==>',row)
+      if(row.route) {
+        this.$router.push({ name: row.route})
+      }
     }
   },
   mounted() {

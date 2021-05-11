@@ -7,3 +7,11 @@ export const login = (params)=> {
     params
   })
 }
+
+export const modifyPassword = (data) => {
+  return axios.request({
+    url: '/api/user/v1/editPassword',
+    method: "POST",
+    data
+  })
+}

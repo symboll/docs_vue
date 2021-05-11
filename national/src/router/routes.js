@@ -39,7 +39,7 @@ export default [
       },
       {
         path: '/intelligence',
-        name: '',
+        name: 'intelligence',
         meta: { title: "情报信息", icon: require('../assets/icons/dhl_qbxx@3x.png') },
         component: ViewWrap,
         children: [
@@ -85,11 +85,11 @@ export default [
         path: '/emphasisPersonalInfo',
         name: 'EmphasisPersonalInfo',
         component: () => import(/* webpackChunkName: "emphasis_personal_info" */ '../views/emphasis_personal/info.vue'),
-        meta: { title: "重点阵地", hide: true}
+        meta: { title: "重点人员", hide: true}
       },
       {
         path: '/statistical',
-        name: '',
+        name: 'statistical',
         meta: { title: "统计分析", icon: require('../assets/icons/dhl_tjfx@3x.png') },
         component: ViewWrap,
         children: [
@@ -121,7 +121,7 @@ export default [
       },
       {
         path: '/settings',
-        name: '',
+        name: 'settings',
         meta: { title: "系统管理", icon: require('../assets/icons/dhl_xtgl@3x.png') },
         component: ViewWrap,
         children: [
@@ -157,6 +157,12 @@ export default [
           }
         ]
       },
+      {
+        path: '/error',
+        name: 'error',
+        component: () => import(/* webpackChunkName: "login" */ '../views/error_pages/404.vue'),
+        meta: { title: "404页面", hide: true },
+      }
     ]
   },
   {

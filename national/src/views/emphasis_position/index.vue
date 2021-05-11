@@ -2,10 +2,14 @@
   <div class="c_wrap">
     <header class="c_header">
       <span>阵地列表</span>
-      <c-button flat iconType="ic_xinzeng" @click="handleCreate"> 
+      <c-button 
+        v-if="buttonList('EmphasisPosition').includes('add')"
+        flat iconType="ic_xinzeng" @click="handleCreate"> 
         <span>新增</span>
       </c-button>
-      <c-button flat iconType="daochu" @click="handleExport">
+      <c-button 
+        v-if="buttonList('EmphasisPosition').includes('toExcel')"
+        flat iconType="daochu" @click="handleExport">
         <span>导出</span>
       </c-button>      
     </header>
@@ -46,21 +50,26 @@
           label="操作"
           width="200">
           <template slot-scope="scope">
+            <template v-if="buttonList('EmphasisPosition').includes('info')">
+              <el-button
+                @click.native.prevent="handleDetail(scope.row)"
+                type="text"
+                size="small">
+                详情
+              </el-button>
+              <span> | </span>
+            </template>
+            <template v-if="buttonList('EmphasisPosition').includes('edit')">
+              <el-button 
+                @click.native.prevent="handleEdit(scope.row)"
+                type="text"
+                size="small">
+                编辑
+              </el-button>
+              <span> | </span>
+            </template>
             <el-button
-              @click.native.prevent="handleDetail(scope.row)"
-              type="text"
-              size="small">
-              详情
-            </el-button>
-            <span> | </span>
-            <el-button
-              @click.native.prevent="handleEdit(scope.row)"
-              type="text"
-              size="small">
-              编辑
-            </el-button>
-            <span> | </span>
-            <el-button
+              v-if="buttonList('EmphasisPosition').includes('del')"
               @click.native.prevent="handleRemove(scope.row)"
               type="text"
               size="small">
@@ -90,7 +99,10 @@
 </template>
 
 <script>
-import { mapState, mapActions, mapMutations } from 'vuex'
+import { mapState, mapActions, mapMutations, mapGetters } from 'vuex'
+
+import { baseURL } from '../../config/index.js'
+import { getToken } from '../../lib/util.js'
 export default {
   data () {
     return {
@@ -126,7 +138,10 @@ export default {
       psList: state => state.policeStationList,
       policeList: state => state.policeList,
       statusList: state => state.positionStatusList
-    })
+    }),
+    ...mapGetters([
+      'buttonList'
+    ])
   },
   mounted() {
     this.init()
@@ -141,6 +156,7 @@ export default {
 
       "getPoliceStationListAction",
       "getPoliceListAction",
+      'exportAction'
     ]),
     ...mapMutations([
       'SET'
@@ -161,7 +177,9 @@ export default {
       this.$router.push({ name: "EmphasisPositionEdit" })
     },
 
-    handleExport() {},
+    handleExport() {
+      window.location.href = `${baseURL}/api/position/v1/toExcel?Authorization=${getToken()}`
+    },
     handleDetail(row) {
       this.$router.push({ 
         name: "EmphasisPositionInfo" , 
@@ -219,8 +237,10 @@ export default {
       this.searchFn()      
     },
     searchFn () {
-      let search = Object.assign(this.searchObj, this.pagination)
-      this.getPositionListAction(search);
+      this.getPositionListAction({
+        ...this.searchObj,
+        ...this.pagination
+      });
     }
   },
 };

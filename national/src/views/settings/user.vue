@@ -18,7 +18,9 @@
     <section class="c_body ">
       <header class="c_header">
         <div class="title">用户列表</div>
-        <c-button flat iconType="ic_xinzeng" @click="handleCreate">
+        <c-button
+          v-if="buttonList('user').includes('add')" 
+          flat iconType="ic_xinzeng" @click="handleCreate">
           <span >新增</span>
         </c-button>
         <div class="search_wrap">
@@ -67,34 +69,40 @@
           label="操作"
           width="200">
           <template slot-scope="scope">
+            <template v-if="buttonList('user').includes('info')" >
+              <el-button
+                @click.native.prevent="handleView(scope.row)"
+                type="text"
+                size="small">
+                详情
+              </el-button>
+              <span> | </span>
+            </template>
+            <template v-if="buttonList('user').includes('edit')" >
+              <el-button 
+                @click.native.prevent="handleEdit(scope.row)"
+                type="text"
+                size="small">
+                编辑
+              </el-button>
+              <span> | </span>
+            </template>
+            <template v-if="buttonList('user').includes('del')" >
+            <el-button 
+                @click.native.prevent="handleRemove(scope.row)"
+                type="text"
+                size="small">
+                删除
+              </el-button>
+              <span> | </span>
+            </template>
             <el-button
-              @click.native.prevent="handleView(scope.row)"
-              type="text"
-              size="small">
-              详情
-            </el-button>
-            <span> | </span>
-            <el-button
-              @click.native.prevent="handleEdit(scope.row)"
-              type="text"
-              size="small">
-              编辑
-            </el-button>
-            <span> | </span>
-            <el-button
-              @click.native.prevent="handleRemove(scope.row)"
-              type="text"
-              size="small">
-              删除
-            </el-button>
-            <span> | </span>
-            <el-button
+              v-if="buttonList('user').includes('rest')" 
               @click.native.prevent="handleReset(scope.row)"
               type="text"
               size="small">
               重置密码
             </el-button>
-            
           </template>
         </el-table-column>
       </el-table>
@@ -155,7 +163,7 @@
 
 <script>
 import { debounce } from 'lodash-es'
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapState, mapGetters } from 'vuex'
 import OrganItem from '../../components/user_organ_item'
 import { deflate } from 'zlib';
 export default {
@@ -209,7 +217,10 @@ export default {
       userInfo: state => state.user.userInfo,
       roleList: state => state.role.roleList,
       currentUser: state => state.user.currentUser
-    })
+    }),
+    ...mapGetters([
+      'buttonList'
+    ])
   },
   methods: {
     ...mapActions([

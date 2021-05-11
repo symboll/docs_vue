@@ -2,12 +2,16 @@
   <div class="c_wrap">
     <header class="c_header">
       <span>人员列表</span>
-      <c-button flat iconType="ic_xinzeng" @click="handleCreate"> 
+      <c-button 
+        v-if="buttonList('EmphasisPersonal').includes('add')"
+        flat iconType="ic_xinzeng" @click="handleCreate"> 
         <span>新增</span>
       </c-button>
-      <c-button flat iconType="ic_daoru" @click="handleImpot">
-        <span>导入</span>
-      </c-button>      
+      <c-button 
+        v-if="buttonList('EmphasisPersonal').includes('import')"
+        flat iconType="ic_daoru" class="file_upload_button">
+        <span>导入 <input type="file" @change="handleImport($event)"></span>
+      </c-button> 
     </header>
     <section class="c_body">
       <c-search 
@@ -55,7 +59,7 @@
           label="操作"
           width="200">
           <template slot-scope="scope">
-            <template v-if="scope.row.status === 'init'">
+            <template v-if="scope.row.status === 'init' && buttonList('EmphasisPersonal').includes('audit')">
               <el-button
                 @click.native.prevent="handleAudit(scope.row)"
                 type="text"
@@ -64,26 +68,32 @@
               </el-button>
               <span> | </span>
             </template>
-            <el-button
-              @click.native.prevent="handleDetail(scope.row)"
-              type="text"
-              size="small">
-              详情
-            </el-button>
-            <span> | </span>
-            <el-button
-              @click.native.prevent="handleEdit(scope.row)"
-              type="text"
-              size="small">
-              编辑
-            </el-button>
-            <span> | </span>
-            <el-button
-              @click.native.prevent="handleRemove(scope.row)"
-              type="text"
-              size="small">
-              删除
-            </el-button>
+            <template v-if="buttonList('EmphasisPersonal').includes('info')">
+              <el-button
+                @click.native.prevent="handleDetail(scope.row)"
+                type="text"
+                size="small">
+                详情
+              </el-button>
+              <span> | </span>
+            </template>
+            <template v-if="buttonList('EmphasisPersonal').includes('edit')">
+              <el-button
+                @click.native.prevent="handleEdit(scope.row)"
+                type="text"
+                size="small">
+                编辑
+              </el-button>
+              <span> | </span>
+            </template>
+            <template v-if="buttonList('EmphasisPersonal').includes('del')">
+              <el-button
+                @click.native.prevent="handleRemove(scope.row)"
+                type="text"
+                size="small">
+                删除
+              </el-button>
+            </template>
           </template>
         </el-table-column>
       </el-table>
@@ -104,11 +114,32 @@
       @confirm="handleConfirm"
       @close="handleClose"
     ></c-c-dialog> 
+
+    <el-dialog
+      title="审核"
+      :visible.sync="auditVisible"
+      width="460px"
+    >
+      <section class="aduit_dialog_body">
+        <div class="title">审核意见</div>
+        <el-input 
+          type="textarea" 
+          v-model="auditInfo" 
+          placeholder="请输入"
+          :autosize="{ minRows: 4, maxRows: 8}"
+        ></el-input>
+        <div class="notes">注：若拒绝审批通过，需输入审核意见</div>
+      </section>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="handleResolveAudit">通 过</el-button>
+        <el-button @click="handleRejectAduit">返 回</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { mapState, mapActions, mapMutations } from 'vuex'
+import { mapState, mapActions, mapMutations, mapGetters } from 'vuex'
 export default {
   data () {
     return {
@@ -133,8 +164,11 @@ export default {
         { property: 'visitStatus', label: '走访记录状态', width: ''},
       ],
       removeId: 0,
-
       visible: false,
+
+      auditId: 0,
+      auditVisible: false,
+      auditInfo: ''
     }
   },
   computed: {
@@ -149,7 +183,10 @@ export default {
 
       statusMap: state => state.personal.statusMap,
       visitStatusMap: state => state.personal.visitStatusMap,
-    })
+    }),
+    ...mapGetters([
+      'buttonList'
+    ])
   },
   mounted() {
     this.init()
@@ -164,6 +201,7 @@ export default {
 
       "getPoliceStationListAction",
       "getPoliceListAction",
+      'personalImportAction'
     ]),
     ...mapMutations([
       "SET"
@@ -184,10 +222,58 @@ export default {
       this.$router.push({ name: "EmphasisPersonalEdit" })
     },
 
-    handleImpot() {},
-    handleAudit () {
-
+    handleImport (event) {
+      if(event.target.files.length === 0) { return }
+      const formData = new FormData()
+      formData.append('file', event.target.files[0])
+      this.personalImportAction(formData)
+        .then(_ => this.getInfoOfficerListAction())
+        .catch(err => this.$message.error('上传失败' + err))
     },
+    handleAudit (row) {
+      this.auditId = row.id
+      this.auditVisible = true
+    },
+    handleResolveAudit () {
+      const param = {
+        auditInfo: this.auditInfo,
+        id: this.auditId,
+        isPass: true,
+        type: 'person'
+      }
+      this.auditPersonalAction(param)
+        .then(_ => {
+          this.auditInfo = ''
+          this.auditId = 0
+          this.auditVisible = false
+          this.getPersonalListAction()
+        })
+        .catch(err => console.log(err))
+    },
+    handleRejectAduit () {
+      if(this.auditInfo === '') {
+        this.$message.error('拒绝审批通过，需输入审核意见')
+        return
+      }
+      const param  = {
+        auditInfo: this.auditInfo,
+        id: this.auditId,
+        isPass: false,
+        type: 'person'
+      }
+      this.auditPersonalAction(param)
+        .then(_ => {
+          this.auditInfo = ''
+          this.auditId = 0
+          this.auditVisible = false
+          this.getPersonalListAction()
+        })
+        .catch(err => console.log(err))
+    },
+
+
+
+
     handleDetail(row) {
       this.$router.push({ 
         name: "EmphasisPersonalInfo" , 
@@ -245,13 +331,16 @@ export default {
       this.searchFn()      
     },
     searchFn () {
-      let search = Object.assign(this.searchObj, this.pagination)
-      this.getPersonalListAction(search);
+      this.getPersonalListAction({
+        ...this.searchObj,
+        ...this.pagination
+      });
     }
   },
 };
 </script>
 <style lang='scss' scoped>
   @import '@/assets/style/custom.scss';
+  @import '@/assets/style/file_upload_button.scss';
 
 </style>

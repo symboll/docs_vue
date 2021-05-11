@@ -40,3 +40,14 @@ export const commonUploadApi = (data) => {
     data
   })
 }
+
+// 导出
+export const exportApi = (params) => {
+  return axios.request({
+    url: `/api/position/${version}/toExcel`,
+    headers: {
+      'Content-Type': 'application/vnd.ms-excel'
+    },
+    params
+  })
+}

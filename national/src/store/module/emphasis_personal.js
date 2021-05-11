@@ -4,7 +4,7 @@ import {
   getDetailApi,
   getListApi,
   auditApi,
-  // importApi
+  importApi
 } from '@/api/template'
 
 const type = 'person'
@@ -71,6 +71,13 @@ const actions = {
         .catch(err => reject(err))
     })
   },
+  personalImportAction ({ commit}, data) {
+    return new Promise((resolve, reject)=> {
+      importApi(type, data)
+        .then(res => resolve(res))
+        .catch(err => reject(err))
+    })
+  }
 }
 const getters = {}
 

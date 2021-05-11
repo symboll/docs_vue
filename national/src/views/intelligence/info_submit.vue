@@ -2,10 +2,14 @@
   <div class="c_wrap">
     <header class="c_header">
       <span>信息报送列表</span>
-      <c-button flat iconType="ic_xinzeng" @click="handleCreate"> 
+      <c-button 
+        v-if="buttonList('InfoSubmit').includes('add')"
+        flat iconType="ic_xinzeng" @click="handleCreate"> 
         <span>新增</span>
       </c-button>
-      <c-button flat iconType="ic_daoru" class="file_upload_button">
+      <c-button 
+        v-if="buttonList('InfoSubmit').includes('import')"
+        flat iconType="ic_daoru" class="file_upload_button">
         <span>导入 <input type="file" @change="handleImport($event)"></span>
       </c-button>
 
@@ -54,23 +58,27 @@
           label="操作"
           width="200">
           <template slot-scope="scope">
+            <template v-if="buttonList('InfoSubmit').includes('audit') && scope.row.status=== 'init'">
+              <el-button
+                @click.native.prevent="handleAudit(scope.row)"
+                type="text"
+                size="small">
+                审核
+              </el-button>
+              <span> | </span>
+            </template>
+            
+            <template v-if="buttonList('InfoSubmit').includes('edit')">
+              <el-button
+                @click.native.prevent="handleEdit(scope.row)"
+                type="text"
+                size="small">
+                编辑
+              </el-button>
+              <span> | </span>
+            </template>
             <el-button
-              v-if="scope.row.status=== 'init' "
-              @click.native.prevent="handleAudit(scope.row)"
-              type="text"
-              size="small">
-              审核
-            </el-button>
-            <span v-if="scope.row.status=== 'init'"> | </span>
-
-            <el-button
-              @click.native.prevent="handleEdit(scope.row)"
-              type="text"
-              size="small">
-              编辑
-            </el-button>
-            <span> | </span>
-            <el-button
+              v-if="buttonList('InfoSubmit').includes('del')"
               @click.native.prevent="handleRemove(scope.row)"
               type="text"
               size="small">
@@ -122,7 +130,7 @@
 </template>
 
 <script>
-import { mapActions, mapState, mapMutations } from "vuex";
+import { mapActions, mapState, mapMutations, mapGetters } from "vuex";
 export default {
   data () {
     return {
@@ -168,6 +176,9 @@ export default {
       useDirList: state => state.useDirectionList,
       statusList: state => state.infoSubmitstatusList
     }),
+    ...mapGetters([
+      buttonList
+    ])
   },
   mounted() {
     this.init()
@@ -310,8 +321,10 @@ export default {
       this.searchFn()      
     },
     searchFn () {
-      let search = Object.assign(this.searchObj, this.pagination)
-      this.getInfoSubmitListAction(search);
+      this.getInfoSubmitListAction({
+        ...this.searchObj,
+        ...this.pagination
+      });
     }
   }
 };

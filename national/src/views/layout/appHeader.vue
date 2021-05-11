@@ -30,12 +30,6 @@ export default {
     })
   },
   methods: {
-    ...mapActions([
-      'getCurrentUserInfoAction'
-    ]),
-    init () {
-      this.getCurrentUserInfoAction()
-    },
     handleCommand (event) {
       switch(event) {
         case 'logout': {
@@ -53,9 +47,6 @@ export default {
         }
       }
     }
-  },
-  mounted() {
-    this.init()
   },
 }
 

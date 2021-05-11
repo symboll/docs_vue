@@ -1,32 +1,60 @@
 <template>
-  <div class="c_wrap">
-    <div class="user_card">
-      <div class="user_card_button">
-        <div class="translate">
-          <div class="avatar" >
-            <div v-if="currentUser && currentUser.head" 
-              :style="{ backgroundImage: `url(${currentUser.head})`}"></div>
+  <div>
+    <div class="c_wrap">
+      <div class="user_card">
+        <div class="user_card_button">
+          <div class="translate">
+            <div class="avatar" >
+              <div v-if="currentUser && currentUser.head" 
+                :style="{ backgroundImage: `url(${currentUser.head})`}"></div>
+            </div>
+            <el-button icon="el-icon-lock" type="primary" @click="modifyPasswrod">修改密码</el-button>
           </div>
-          <el-button icon="el-icon-lock" type="primary" @click="modifyPasswrod">修改密码</el-button>
+        </div>
+        <div class="user_card_info">
+          <div><div>账 号</div><div>{{ currentUser.accountName }}</div> </div>
+          <div><div>警 号</div><div>{{ currentUser.id }}</div></div>
+          <div><div>所属角色</div><div>
+            <span v-for="item in currentUser.roleNames" :key="item">{{item}}</span>
+          </div></div>
+          <div><div>所属组织</div><div>{{ currentUser.orgName }}</div></div>
         </div>
       </div>
-      <div class="user_card_info">
-        <div><div>账 号</div><div>{{ currentUser.accountName }}</div> </div>
-        <div><div>警 号</div><div>{{ currentUser.id }}</div></div>
-        <div><div>所属角色</div><div>
-          <span v-for="item in currentUser.roleNames" :key="item">{{item}}</span>
-        </div></div>
-        <div><div>所属组织</div><div>{{ currentUser.orgName }}</div></div>
-      </div>
     </div>
+    <c-t-dialog
+      :visible="visible"
+      title="修改密码"
+      @close="handleClose"
+      @confirm="handleConfirm"
+    >
+      <el-form :model="form" ref="form" :rules="rules">
+        <el-form-item label="旧密码" prop="oldPwd">
+          <el-input v-model="form.oldPwd"></el-input>
+        </el-form-item>
+        <el-form-item label="新密码" prop="password">
+          <el-input v-model="form.password"></el-input>
+        </el-form-item>
+      </el-form>
+    </c-t-dialog>
   </div>
 </template>
 
 <script>
 import { mapState,mapActions } from 'vuex'
+import { setToken } from '@/lib/util.js'
 export default {
   data() {
-    return{}
+    return{
+      visible: false,
+      form: {
+        oldPwd:'',
+        password: ""
+      },
+      rules: {
+        oldPwd: [{required: true, message: "请输入旧密码"}],
+        password: [{required: true, message: "请输入新密码"}],
+      }
+    }
   },
   computed: {
     ...mapState({
@@ -34,8 +62,31 @@ export default {
     })
   },
   methods: {
+    ...mapActions([
+      'modifyPasswordApi'
+    ]),
     modifyPasswrod () {
-
+      this.visible= true
+    },
+    handleClose () {
+      this.visible = false
+    },
+    handleConfirm () {
+      this.$refs['form'].validate((valid) => {
+        if (valid) {
+          this.modifyPasswordApi({
+            ...this.form,
+            id: this.currentUser.id
+          }).then(res => {
+            this.$message.success('修改成功!')
+            this.handleClose()
+            setToken()
+            this.$router.push({ name: 'login' })
+          })
+        }else {
+          return false
+        }
+      })
     }
   },
 
