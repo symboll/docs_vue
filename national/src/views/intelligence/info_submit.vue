@@ -177,7 +177,7 @@ export default {
       statusList: state => state.infoSubmitstatusList
     }),
     ...mapGetters([
-      buttonList
+      'buttonList'
     ])
   },
   mounted() {

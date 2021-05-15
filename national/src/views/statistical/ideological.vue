@@ -20,6 +20,7 @@
         <el-table-column type="index" label="序号" wdith="100"></el-table-column>
         <template v-for="item in tableHeader">
           <el-table-column
+            v-if="!item.children"
             :key="item.property"
             :label="item.label"
             :width="item.width"  
@@ -32,6 +33,24 @@
                 <span>{{ scope.row[item.property] }}</span>
               </template>
             </template>
+          </el-table-column>
+
+          <el-table-column
+            v-else
+            :key="item.property"
+            :label="year"
+            :width="item.width"
+          >
+            <el-table-column 
+              v-for="i in item.children" 
+              :label="i.label"
+              :key="i.property"
+            >
+              <template slot-scope="scope" >
+                <span>{{ scope.row[i.property] }}</span>
+              </template>
+            </el-table-column>
+
           </el-table-column>
         </template>
       </el-table>
@@ -58,6 +77,7 @@ export default {
         pageNo: 1,
         pageSize: 10
       },
+      year: new Date().getFullYear() + '年',
       searchObj : {},
       searchList: [
         { label: '人员姓名', key: 'name', value: '', type: 'el-input', clearable: true },
@@ -70,10 +90,14 @@ export default {
         { property: 'name', label: '姓名', width: ''},
         { property: 'taskType', label: '任务类型', width: ''},
         { property: 'deptName', label: '所属派出所', width: ''},
-        { property: 'one', label: '一季度', width: ''},
-        { property: 'two', label: '二季度', width: ''},
-        { property: 'three', label: '三季度', width: ''},
-        { property: 'four', label: '四季度', width: ''},
+        { property: 'year', label: `2021年`, children: [
+            { property: 'one', label: '一季度', width: ''},
+            { property: 'two', label: '二季度', width: ''},
+            { property: 'three', label: '三季度', width: ''},
+            { property: 'four', label: '四季度', width: ''},
+          ] 
+        },
+
       ],
       taskTypeList: [{
          id: "auto", label: "自动"
@@ -107,6 +131,8 @@ export default {
       this.getIdeologicalAction(params)
     },
     handleSearch (searchObj) {
+      const {year} = searchObj
+      if (year) this.year = year + '年'
       this.searchObj = searchObj
       this.searchFn()
     },

@@ -2,8 +2,8 @@
   <div class="c_wrap">
     <header class="c_header">
       <span>人员列表</span>
+      <!-- v-if="buttonList('EmphasisPersonal').includes('add')" -->
       <c-button 
-        v-if="buttonList('EmphasisPersonal').includes('add')"
         flat iconType="ic_xinzeng" @click="handleCreate"> 
         <span>新增</span>
       </c-button>

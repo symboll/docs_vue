@@ -55,7 +55,7 @@
           label="操作"
           width="200">
           <template slot-scope="scope">
-            <template v-if="scope.row.status=== 'init' && buttonList('InfoOfficer').includes('aduit')">
+            <template v-if="scope.row.status=== 'init' && buttonList('InfoOfficer').includes('audit')">
               <el-button
                 @click.native.prevent="handleAudit(scope.row)"
                 type="text"
