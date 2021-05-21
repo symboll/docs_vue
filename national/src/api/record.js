@@ -13,3 +13,16 @@ export const getDetailApi = (type, params)=> {
     params
   })
 }
+
+
+/**
+ * 任务下放
+ * @param {*} id 
+ * @returns 
+ */
+export const taskDownApi = (id) => {
+  return axios.request({
+    url: `/api/person/${version}/taskDown/${id}`,
+    method:"POST"
+  })
+}

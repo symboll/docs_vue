@@ -180,7 +180,11 @@ export default {
       const formData = new FormData()
       formData.append('file', event.target.files[0])
       this.commonUploadAction(formData)
-        .then(res => this.SET_INFO_SUBMIT_ITEM_ATTCH(res))
+        .then(res => {
+          console.log('res', res)
+          this.SET_INFO_SUBMIT_ITEM_ATTCH(res)
+          this.$forceUpdate()
+        })
         .catch(err => this.$message.error('上传失败' + err))
     },
     handleChange (key, id) {
@@ -219,7 +223,10 @@ export default {
             sysUserName,
             infoSource
           })
-            .then(res => this.$message.success(this.itemInfo.id ?'修改成功!' : '创建成功！'))
+            .then(res => {
+              this.$message.success(this.itemInfo.id ?'修改成功!' : '创建成功！')
+              this.$router.go(-1)
+            })
             .catch(err => this.$message.error(this.itemInfo.id ?'修改失败!' : '创建失败！'))
         } else {
           return false;

@@ -31,7 +31,7 @@
             v-model="itemInfo[item.key]" 
             @change="handleChange(item.key, itemInfo[item.key])"
           >            
-            <template v-if="item.option && (item.key === 'orgId' || item.key === 'sysUserId')">
+            <template v-if="item.option">
               <el-option 
                 v-for="cur in computedList(item.option)"
                 :key="cur.id"
@@ -48,6 +48,7 @@
 
 <script>
 import { mapState,mapActions } from 'vuex'
+import { constants } from 'fs';
 export default {
   data () {
     return {
@@ -120,6 +121,7 @@ export default {
         case 'psList': return this.psList;
         case 'policeList': return this.policeList;
         case 'visitFrequencyList': return this.visitFrequencyList;
+        case 'typeList': return this.typeList;
         default: return [];
       }
     },
@@ -135,8 +137,20 @@ export default {
     handleSubmit () {
       this.$refs['form'].validate((valid) => {
         if (valid) {
-          this.createOrUpdatePositionAction(this.itemInfo)
-            .then(res => this.$message.success(this.itemInfo.id ?'修改成功!' : '创建成功！'))
+          const deptName = (this.psList.find(item => item.id === this.itemInfo.orgId) || {}).name
+          const sysUserName = (this.policeList.find(item => item.id === this.itemInfo.sysUserId) || {}).name
+          const type = (this.typeList.find(item => item.id === this.itemInfo.type)|| {}).name
+
+          this.createOrUpdatePositionAction({
+            ...this.itemInfo,
+            deptName,
+            sysUserName,
+            type
+          })
+            .then(res => {
+              this.$message.success(this.itemInfo.id ?'修改成功!' : '创建成功！')
+              this.$router.go(-1)
+            })
             .catch(err => this.$message.error(this.itemInfo.id ?'修改失败!' : '创建失败！'))
         } else {
           return false;

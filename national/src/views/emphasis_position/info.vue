@@ -111,7 +111,7 @@
       :visible="visible"
       :title="title"
       confirmButtonText='保 存'
-      width="600px"
+      width="680px"
       @confirm="handleConfirm"
       @close="handleClose"
     >
@@ -128,28 +128,29 @@
             }"
           > 
             <template v-if="item.key === 'upload'">
-              <template v-if="recordInfo.attachmentList && recordInfo.attachmentList.length > 0">
-                <div v-for="i in recordInfo.attachmentList" :key="i" class="upload_item">
-                  <el-tooltip  effect="dark" :content="i" placement="top-start">
-                    <a :href="i">
-                      <img 
-                        v-if="computedFormat(i) === 'img'"
-                        :src="i" alt=""
-                        class="img_style"
-                      >
-                      <video 
-                        v-else-if="computedFormat(i) === 'video'" 
-                        :src="i"  
-                        class="video_style"
-                      ></video>
-                      <i v-else class="el-icon-document-copy file_style"></i>
-                    </a>
-                  </el-tooltip>
+              <c-upload-btn
+                @change="handleImport"
+                :imageLth="recordInfo.attachmentList && recordInfo.attachmentList.length"
+                :videoLth="recordInfo.video && recordInfo.video.length"
+              ></c-upload-btn>
+              <div class="image_wrap" v-if="recordInfo.attachmentList && recordInfo.attachmentList.length > 0">
+                <div v-for="(i,index) in recordInfo.attachmentList" :key="i" class="upload_item">
+                  <img
+                    :src="i" alt=""
+                    class="img_style"
+                  >
+                  <i @click="deleteItem(index, 'image')" class="el-icon-error"></i>
                 </div>
-              </template>
-              <c-button flat iconType="daochu" class="file_upload_button">
-                <span>上传附件 <input type="file" @change="handleImport($event)"></span>
-              </c-button>
+              </div>
+              <div class="video_wrap" v-if="recordInfo.video && recordInfo.video.length > 0">
+               <div v-for="(i,index) in recordInfo.video" :key="i" class="upload_item">     
+                  <video 
+                    :src="i"  
+                    class="video_style"
+                  ></video>
+                  <i @click="deleteItem(index, 'video')" class="el-icon-error"></i>
+                </div>
+              </div>
             </template>
           </div>
           <component 
@@ -203,7 +204,7 @@
     <c-t-dialog
       :visible="infoVisible"
       title="详情"
-      width="600px"
+      width="680px"
       @confirm="infoClose"
       @close="infoClose"
     >
@@ -215,25 +216,24 @@
               {{ recordInfo[item.key] }}
             </template>
             <template v-else>
-              <template v-if="recordInfo.attachmentList && recordInfo.attachmentList.length > 0">
-                <div v-for="i in recordInfo.attachmentList" :key="i" class="upload_item">
-                  <el-tooltip  effect="dark" :content="i" placement="top-start">
-                    <a :href="i">
-                      <img 
-                        v-if="computedFormat(i) === 'img'"
-                        :src="i" alt=""
-                        class="img_style"
-                      >
-                      <video 
-                        v-else-if="computedFormat(i) === 'video'" 
-                        :src="i"  
-                        class="video_style"
-                      ></video>
-                      <i v-else class="el-icon-document-copy file_style"></i>
-                    </a>
-                  </el-tooltip>
+              <div class="upload_wrap">
+                <div class="image_wrap" v-if="recordInfo.attachmentList && recordInfo.attachmentList.length > 0">
+                  <div v-for="(i,index) in recordInfo.attachmentList" :key="i" class="upload_item">
+                    <img
+                      :src="i" alt=""
+                      class="img_style"
+                    >
+                  </div>
                 </div>
-              </template>
+                <div class="video_wrap" v-if="recordInfo.video && recordInfo.video.length > 0">
+                <div v-for="(i,index) in recordInfo.video" :key="i" class="upload_item">     
+                    <video 
+                      :src="i"  
+                      class="video_style"
+                    ></video>
+                  </div>
+                </div>
+              </div>
             </template>
           </div>
         </div>
@@ -245,7 +245,11 @@
 
 <script>
 import { mapState, mapActions, mapMutations } from 'vuex'
+import CUploadBtn from '@/components/c-upload-btn'
 export default {
+  components: {
+    CUploadBtn
+  },
   data () {
     return {
       createOrEditForm: [
@@ -332,7 +336,7 @@ export default {
       'getDicItemsAction'
     ]),
     ...mapMutations([
-      'SET_RECORD_ITEM_ATTCH'
+      'RECORD_ITEM_UPDATE'
     ]),
     computedFormat(url) {
       const imgPattern =  /\.(jpg|png|gif|jpeg)$/;
@@ -340,6 +344,9 @@ export default {
 
       if(imgPattern.test(url)) return 'img'
       else if(videoPattern.test(url)) return 'video'
+    },
+    deleteItem (index, type) {
+      this.RECORD_ITEM_UPDATE({index, type})
     },
     init () {
       const { id } = this.$route.query
@@ -367,14 +374,34 @@ export default {
         default: return [];
       }
     },
-    handleImport (event) {
-      if(event.target.files.length === 0) { return }
+    handleImport ({event, type}) {
+      const files = event.target.files
+      console.log('files', files)
+      if(files.length === 0) { 
+        return 
+      }else if (files[0].type.split('/')[0] !== type) { 
+        this.$message.error('文件格式错误');
+        return
+      }else if (files[0].type.split('/')[0] === 'video' && files[0].size > 2000000) {
+        this.$message.error('文件大小超出');
+        return
+      }
       const formData = new FormData()
       formData.append('file', event.target.files[0])
       this.commonUploadAction(formData)
-        .then(res => this.SET_RECORD_ITEM_ATTCH(res))
+        .then(res => {
+          this.RECORD_ITEM_UPDATE({ file: res, type })
+        })
         .catch(err => this.$message.error('上传失败' + err))
     },
+    // handleImport (event) {
+    //   if(event.target.files.length === 0) { return }
+    //   const formData = new FormData()
+    //   formData.append('file', event.target.files[0])
+    //   this.commonUploadAction(formData)
+    //     .then(res => this.SET_RECORD_ITEM_ATTCH(res))
+    //     .catch(err => this.$message.error('上传失败' + err))
+    // },
     handleCreate () {
       this.visible = true
       this.title = '创建'
@@ -389,8 +416,7 @@ export default {
             type: "position"
           })
             .then(res => {
-              this.visible = false
-              this.title = ''
+              this.handleClose()
               this.$message.success(this.recordInfo.id ? '修改成功!':'修改成功！')
               this.searchFn()
             })
@@ -402,8 +428,12 @@ export default {
       })
     },
     handleClose () {
-      this.visible = false
+      this.SET({ module: "record", key: "recordItem", value: {
+        attachmentList:[],
+        video: []
+      }})
       this.title = ''
+      this.visible = false
     },
     handleSizeChange (val) {
       this.pagination.pageSize = val
@@ -494,24 +524,31 @@ export default {
 </script>
 <style lang="scss" scoped>
   @import '@/assets/style/custom_info.scss';
-  @import '@/assets/style/file_upload_button.scss';
-  .upload_wrap {
-    display: flex;
-    align-items: center;
-    .upload_item {
-      margin-right: 20px;
-      .file_style {
-        font-size: 40px;
-        color: #909399;
-      }
-      .img_style{
-        width: 80px;
-        height: 80px;
 
-      }
-      .video_style {
-        width: 160px;
-        height: 160px;
+  .upload_wrap {
+    .image_wrap,
+    .video_wrap {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      .upload_item {
+        margin-right: 20px;
+        position: relative;
+        .img_style{
+          width: 80px;
+          height: 80px;
+        }
+        .video_style {
+          width: 120px;
+          height: 80px;
+        }
+        i {
+          cursor: pointer;
+          position: absolute;
+          right: 10px;
+          top: 10px;
+        }
       }
     }
   }
@@ -530,26 +567,6 @@ export default {
       display: flex;
       align-items: center;
       justify-content: flex-end;
-    }
-    > div:nth-child(2) {
-      display: flex;
-      align-items: center;
-      .upload_item {
-        margin-right: 20px;
-        .file_style {
-          font-size: 40px;
-          color: #909399;
-        }
-        .img_style{
-          width: 80px;
-          height: 80px;
-
-        }
-        .video_style {
-          width: 160px;
-          height: 160px;
-        }
-      }
     }
   }
 }

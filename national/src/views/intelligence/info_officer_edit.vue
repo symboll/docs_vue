@@ -140,7 +140,10 @@ export default {
             deptName,
             sysUserName
           })
-            .then(res => this.$message.success(this.itemInfo.id ?'修改成功!' : '创建成功！'))
+            .then(res =>{
+              this.$message.success(this.itemInfo.id ?'修改成功!' : '创建成功！')
+              this.$router.go(-1)
+            })
             .catch(err => this.$message.error(this.itemInfo.id ?'修改失败!' : '创建失败！'))
         } else {
           return false;

@@ -75,6 +75,16 @@
               <span> | </span>
             </template>
             
+            <!-- <template v-if="buttonList('InfoOfficer').includes('info')"> -->
+              <el-button
+                @click.native.prevent="handleView(scope.row)"
+                type="text"
+                size="small">
+                详情
+              </el-button>
+              <span> | </span>
+            <!-- </template> -->
+
             <template v-if="buttonList('InfoOfficer').includes('edit')">
               <el-button
                 @click.native.prevent="handleEdit(scope.row)"
@@ -237,7 +247,13 @@ export default {
         .then(_ => this.getInfoOfficerListAction())
         .catch(err => this.$message.error('上传失败' + err))
     },
-
+    handleView (row) {
+      this.getPoliceListAction(row.orgId)
+      this.$router.push({ 
+        name: "InfoOfficerInfo",
+        query: { id: row.id }
+      })
+    },
     handleEdit (row) {
       this.getPoliceListAction(row.orgId)
       this.$router.push({ 

@@ -56,6 +56,12 @@ export default [
             meta: { title: "信息员管理" , hide: true},
           },
           {
+            path: 'info_officer_info',
+            name: 'InfoOfficerInfo',
+            component: () => import(/* webpackChunkName: "info_officer_info" */ '../views/intelligence/info_officer_info.vue'),
+            meta: { title: "信息员管理" , hide: true},
+          },
+          {
             path: 'info_submit',
             name: 'InfoSubmit',
             component: () => import(/* webpackChunkName: "info_submit" */ '../views/intelligence/info_submit.vue'),
@@ -65,6 +71,12 @@ export default [
             path: 'info_submit_edit',
             name: 'InfoSubmitEdit',
             component: () => import(/* webpackChunkName: "info_submit_edit" */ '../views/intelligence/info_submit_edit.vue'),
+            meta: { title: "信息上报" , hide: true},
+          },
+          {
+            path: 'info_submit_info',
+            name: 'InfoSubmitInfo',
+            component: () => import(/* webpackChunkName: "info_submit_info" */ '../views/intelligence/info_submit_info.vue'),
             meta: { title: "信息上报" , hide: true},
           },
         ]

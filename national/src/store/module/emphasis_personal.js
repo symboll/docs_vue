@@ -7,6 +7,7 @@ import {
   importApi
 } from '@/api/template'
 
+import { taskDownApi  } from '@/api/record'
 const type = 'person'
 
 const state = {
@@ -74,6 +75,13 @@ const actions = {
   personalImportAction ({ commit}, data) {
     return new Promise((resolve, reject)=> {
       importApi(type, data)
+        .then(res => resolve(res))
+        .catch(err => reject(err))
+    })
+  },
+  taskDownAction({commit}, id) {
+    return new Promise((resolve,reject) => {
+      taskDownApi(id)
         .then(res => resolve(res))
         .catch(err => reject(err))
     })

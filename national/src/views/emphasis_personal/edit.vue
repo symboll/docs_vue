@@ -32,7 +32,7 @@
             v-model="itemInfo[item.key]" 
             @change="handleChange(item.key, itemInfo[item.key])"
           >            
-            <template v-if="item.option && (item.key === 'orgId' || item.key === 'sysUserId')">
+            <template v-if="item.option">
               <el-option 
                 v-for="cur in computedList(item.option)"
                 :key="cur.id"
@@ -49,6 +49,7 @@
 
 <script>
 import { mapState,mapActions } from 'vuex'
+import { constants } from 'fs';
 export default {
   data () {
     return {
@@ -93,7 +94,7 @@ export default {
   },
   computed: {
     ...mapState({
-      itemInfo: state => state.position.positionItem,
+      itemInfo: state => state.personal.personalItem,
       psList: state => state.policeStationList,
       policeList: state => state.policeList,
 
@@ -164,13 +165,18 @@ export default {
         if (valid) {
           const deptName = (this.psList.find(item => item.id === this.itemInfo.orgId) || {}).name
           const sysUserName = (this.policeList.find(item => item.id === this.itemInfo.sysUserId) || {}).name
+          const organizationType = (this.organTypeList.find(item => item.id === this.itemInfo.organizationType)|| {}).name
 
           this.createOrUpdatePersonalAction({
             ...this.itemInfo,
             deptName,
-            sysUserName
+            sysUserName,
+            organizationType
           })
-            .then(res => this.$message.success(this.itemInfo.id ?'修改成功!' : '创建成功！'))
+            .then(res => {
+              this.$message.success(this.itemInfo.id ?'修改成功!' : '创建成功！')
+              this.handleBack()
+            })
             .catch(err => this.$message.error(this.itemInfo.id ?'修改失败!' : '创建失败！'))
         } else {
           return false;

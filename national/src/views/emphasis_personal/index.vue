@@ -132,7 +132,7 @@
       </section>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="handleResolveAudit">通 过</el-button>
-        <el-button @click="handleRejectAduit">返 回</el-button>
+        <el-button @click="handleRejectAduit">拒 绝</el-button>
       </span>
     </el-dialog>
   </div>
@@ -248,7 +248,7 @@ export default {
           this.auditVisible = false
           this.getPersonalListAction()
         })
-        .catch(err => console.log(err))
+        .catch(err => this.$message.error(err))
     },
     handleRejectAduit () {
       if(this.auditInfo === '') {
@@ -268,7 +268,7 @@ export default {
           this.auditVisible = false
           this.getPersonalListAction()
         })
-        .catch(err => console.log(err))
+        .catch(err => this.$message.error(err))
     },
 
 

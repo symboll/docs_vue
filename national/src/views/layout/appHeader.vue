@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
+import { mapState, mapActions, mapMutations } from 'vuex'
 import { setToken } from '../../lib/util.js'
 export default {
   name: "appHeader",
@@ -30,10 +30,14 @@ export default {
     })
   },
   methods: {
+    ...mapMutations([
+      'SET'
+    ]),
     handleCommand (event) {
       switch(event) {
         case 'logout': {
           setToken('')
+          this.SET({ module: "user", key: "currentUser", value: {} })
           this.$router.push({
             name: 'login'
           })
