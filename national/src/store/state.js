@@ -85,5 +85,12 @@ export default {
   ],
 
   evaluationList:[],
-  tEvaluationList: []
+  tEvaluationList: [],
+  employedList: [
+    {id: true, name: '录用', },
+    {id: false, name: '不录用'}
+  ],
+  contactList: [],
+  assessList: [],
+  addressList: []
 }

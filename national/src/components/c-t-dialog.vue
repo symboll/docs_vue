@@ -10,8 +10,8 @@
     >
       <slot></slot>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="handleConfirm">{{ confirmButtonText }}</el-button>
-        <el-button @click="handleCancel">取 消</el-button>
+        <el-button v-if="showConfirm" type="primary" @click="handleConfirm">{{ confirmButtonText }}</el-button>
+        <el-button @click="handleCancel">{{ showConfirm ? '取 消': '关 闭' }} </el-button>
       </span>
     </el-dialog>
   </div>
@@ -38,6 +38,10 @@ export default {
     width: {
       type: String,
       default: "460px"
+    },
+    showConfirm: {
+      type: Boolean,
+      default: true
     }
   },
   methods: {

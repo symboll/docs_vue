@@ -85,9 +85,10 @@ export default {
         { label: '信息来源', key: 'infoSource', type: 'el-select', option: 'infoSourceList'},
         { label: '信息员编号', key: 'personNo', type: 'el-input' , inithide: true},
         { label: '情报编号', key: 'infoNo', type: 'el-input' },
-        { label: '上报人', key: 'sysUserId',  type: 'el-select', option: "policeList", },
-        { label: '上报时间', key: 'reportTime', type: 'el-date-picker', datePickerType: 'date' },
-        { label: '上报单位', key: 'orgId', type: 'el-select', option: "psList" },
+        { label: '是否录用', key: 'employed', type: 'el-select', option: "employedList" },
+        // { label: '上报人', key: 'sysUserId',  type: 'el-select', option: "policeList", },
+        // { label: '上报时间', key: 'reportTime', type: 'el-date-picker', datePickerType: 'date' },
+        // { label: '上报单位', key: 'orgId', type: 'el-select', option: "psList" },
         { key: 'title2', type: "div" , className: "title", context: "情报信息:" },
         { label: '情报标题', key: 'title', type: 'el-input' },
         { label: "情报正文", key: 'editor', type: "div" , ref: "editor", className: "editor" },
@@ -109,7 +110,8 @@ export default {
       itemInfo: state => state.infoSubmit.infoSubmitItem,
       psList: state => state.policeStationList,
       policeList: state => state.policeList,
-      infoSourceList: state => state.infoSourceList
+      infoSourceList: state => state.infoSourceList,
+      employedList: state => state.employedList
     }),
   },
   mounted() {
@@ -149,8 +151,8 @@ export default {
       if(id) {
         this.getInfoSubmitDetailAction(id)
           .then(res => {
-            if(res.infoSource === '信息员上报') {
-              this.createOrEditForm.splice(1,1,{ 
+            if(res.infoSource === "情报员上报") {
+              this.createOrEditForm.splice(2,1,{ 
                 label: '信息员编号', 
                 key: 'personNo', 
                 type: 'el-input'})
@@ -172,6 +174,7 @@ export default {
         case 'psList': return this.psList;
         case 'policeList': return this.policeList;
         case 'infoSourceList': return this.infoSourceList
+        case 'employedList': return this.employedList
         default: return [];
       }
     },

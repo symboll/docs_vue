@@ -10,8 +10,29 @@ export default [
       {
         path: '/todolist',
         name: 'TodoList',
-        component: () => import(/* webpackChunkName: "todolist" */ '../views/todo_list/index.vue'),
-        meta: { title: "代办事项", icon: require('../assets/icons/dhl_dbsx@3x.png') }
+        // component: () => import(/* webpackChunkName: "todolist" */ '../views/todo_list/index.vue'),
+        component: ViewWrap,
+        meta: { title: "代办事项", icon: require('../assets/icons/dhl_dbsx@3x.png') },
+        children: [
+          {
+            path: 'home',
+            name: 'Home',
+            component: () => import(/* webpackChunkName: "todolist" */ '../views/todo_list/index.vue'),
+            meta: { title: "代办事项" }
+          },
+          {
+            path: 'daily',
+            name: 'Daily',
+            component: () => import(/* webpackChunkName: "daily" */ '../views/todo_list/daily.vue'),
+            meta: { title: "日常管理"  }
+          },
+          {
+            path: 'temporary',
+            name: 'Temporary',
+            component: () => import(/* webpackChunkName: "todolist" */ '../views/todo_list/temporary.vue'),
+            meta: { title: "临时调度" }
+          }
+        ]
       },
       {
         path: '/person',

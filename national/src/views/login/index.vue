@@ -1,6 +1,6 @@
 <template>
   <div class="login_wrap">
-    <div class="login_title">浙江省保安员资格考试系统</div>
+    <div class="login_title">国保基础防控系统</div>
     <div class="login_card">
       <div class="login_form">
         <div class="login_form_title">
@@ -47,7 +47,7 @@ export default {
     handleSubmit () {
       const { accountName, password } = this.form
       this.LoginAction({ accountName, password  }).then(_ => {
-        this.$router.push({ name: "TodoList" })
+        this.$router.push({ name: "Home" })
       }).catch(_ => this.isError = true);
     }
   }

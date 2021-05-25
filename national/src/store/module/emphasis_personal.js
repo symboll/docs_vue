@@ -16,14 +16,21 @@ const state = {
   personalItem: {},
 
   statusMap: {
-    init: '审核中',
-    finish: '完成',
-    fail: '办结'
+    // init: '审核中',
+    // finish: '完成',
+    // fail: '办结'
+    init:'审核中',
+    finish:'完成',
+    fail:'审核失败',
+    close: '办结中',
+    close_finish:'办结审核成功',
+    close_fail: '办结审核失败'
   },
   visitStatusMap: {
     init: '待审核',
     finish: '已审核',
-    fail: '已拒绝'
+    fail: '已拒绝',
+    evaluation: '已评价'
   },
 }
 const mutations = {}

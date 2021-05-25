@@ -40,7 +40,7 @@
               />
             </template>
 
-            <template v-else-if="item.option && item.key === 'useType'">
+            <template v-else-if="item.option">
               <el-option 
                 v-for="cur in computedList(item.option)"
                 :key="cur.id"
@@ -66,13 +66,25 @@ export default {
         { label: '使用方向', key: 'useType', type: 'el-select', option: "useDirList" },
         { label: '所属派出所', key: 'orgId',  type: 'el-select', option: "psList", },
         { label: '责任民警', key: 'sysUserId', type: 'el-select', option: "policeList" },
+        { label: '联络频率', key: 'contact', type: 'el-select', option: "contactList" },
+        { label: '考核频率', key: 'assess', type: 'el-select', option: "assessList" },
+        { label: '信息员级别', key: 'personLevel', type: 'el-select', option: "personLevelList" },
       ],
       rules: {
         personNo: [{ required: true, message: '请输入信息员代号', trigger: 'blur' },],
         useType: [{ required: true, message: '请选择使用方向', trigger: 'blur' },],
         orgId: [{ required: true, message: '请选择所属派出所', trigger: 'blur' },],
         sysUserId: [{ required: true, message: '请选择责任民警', trigger: 'blur' },],
-      }
+        contact: [{ required: true, message: '请选择联络频率', trigger: 'blur' },],
+        assess: [{ required: true, message: '请选择考核频率', trigger: 'blur' },],
+        personLevel: [{ required: true, message: '请选择信息员级别', trigger: 'blur' },],
+      },
+      optionlist: [
+        { typeCode: "使用方向", key: "useDirectionList"  },
+        { typeCode: "联络频率", key: "contactList"  },
+        { typeCode: "考核频率", key: "assessList"  },
+        { typeCode: "信息员级别", key: "personLevelList"  },
+      ]
     }
   },
   computed: {
@@ -81,6 +93,10 @@ export default {
       psList: state => state.policeStationList,
       policeList: state => state.policeList,
       useDirList: state => state.useDirectionList,
+
+      contactList:state => state.contactList,
+      assessList: state => state.assessList,
+      personLevelList:state => state.personLevelList
     })
   },
   mounted() {
@@ -106,16 +122,23 @@ export default {
           .catch(err => console.log(err))
 
       }
-      if(this.useDirList.length === 0 ) {
-        this.getDicItemsAction({ typeCode: "使用方向", key: "useDirectionList"  })
+      // if(this.useDirList.length === 0 ) {
+      //   this.getDicItemsAction({ typeCode: "使用方向", key: "useDirectionList"  })
+      //     .catch(err => console.log(err))
+      // }
+      this.optionlist.forEach(item => {
+        this.getDicItemsAction(item)
           .catch(err => console.log(err))
-      }
+      })
     },
     computedList (option) {
       switch (option) {
         case 'psList': return this.psList;
         case 'policeList': return this.policeList;
         case 'useDirList': return this.useDirList;
+        case 'contactList': return this.contactList;
+        case 'assessList': return this.assessList;
+        case 'personLevelList': return this.personLevelList;
         default: return [];
       }
     },
@@ -138,7 +161,7 @@ export default {
           this.createOrUpdateInfoOfficerAction({
             ...this.itemInfo,
             deptName,
-            sysUserName
+            sysUserName,
           })
             .then(res =>{
               this.$message.success(this.itemInfo.id ?'修改成功!' : '创建成功！')

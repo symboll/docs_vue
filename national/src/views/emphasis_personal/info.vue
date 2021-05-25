@@ -163,7 +163,7 @@
               <c-upload-btn
                 @change="handleImport"
                 :imageLth="recordInfo.attachmentList && recordInfo.attachmentList.length"
-                :videoLth="recordInfo.video && recordInfo.video.length"
+                :videoLth="recordInfo.videoList && recordInfo.videoList.length"
               ></c-upload-btn>
               <div class="image_wrap" v-if="recordInfo.attachmentList && recordInfo.attachmentList.length > 0">
                 <div v-for="(i,index) in recordInfo.attachmentList" :key="i" class="upload_item">
@@ -174,8 +174,8 @@
                   <i @click="deleteItem(index, 'image')" class="el-icon-error"></i>
                 </div>
               </div>
-              <div class="video_wrap" v-if="recordInfo.video && recordInfo.video.length > 0">
-               <div v-for="(i,index) in recordInfo.video" :key="i" class="upload_item">     
+              <div class="video_wrap" v-if="recordInfo.videoList && recordInfo.videoList.length > 0">
+               <div v-for="(i,index) in recordInfo.videoList" :key="i" class="upload_item">     
                   <video 
                     :src="i"  
                     class="video_style"
@@ -266,8 +266,8 @@
                     >
                   </div>
                 </div>
-                <div class="video_wrap" v-if="recordInfo.video && recordInfo.video.length > 0">
-                <div v-for="(i,index) in recordInfo.video" :key="i" class="upload_item">     
+                <div class="video_wrap" v-if="recordInfo.videoList && recordInfo.videoList.length > 0">
+                <div v-for="(i,index) in recordInfo.videoList" :key="i" class="upload_item">     
                     <video 
                       :src="i"  
                       class="video_style"
@@ -454,13 +454,13 @@ export default {
         query: { id }
       })
     },
-    computedFormat(url) {
-      const imgPattern =  /\.(jpg|png|gif|jpeg)$/;
-      const videoPattern = /\.(mp4|avi|wmv|mov|mpeg|mpg|rm|ram|swf|flv)$/;
+    // computedFormat(url) {
+    //   const imgPattern =  /\.(jpg|png|gif|jpeg)$/;
+    //   const videoPattern = /\.(mp4|avi|wmv|mov|mpeg|mpg|rm|ram|swf|flv)$/;
 
-      if(imgPattern.test(url)) return 'img'
-      else if(videoPattern.test(url)) return 'video'
-    },
+    //   if(imgPattern.test(url)) return 'img'
+    //   else if(videoPattern.test(url)) return 'video'
+    // },
     deleteItem (index, type) {
       this.RECORD_ITEM_UPDATE({index, type})
     },
@@ -544,7 +544,7 @@ export default {
     handleClose () {
       this.SET({ module: "record", key: "recordItem", value: {
         attachmentList:[],
-        video: []
+        videoList: []
       }})
       this.title = ''
       this.visible = false
@@ -566,7 +566,7 @@ export default {
         auditInfo: this.auditInfo,
         id: this.auditId,
         isPass: true,
-        type: 'position'
+        type: 'person'
       }
       this.auditRecordAction(param)
         .then(_ => {
@@ -586,7 +586,7 @@ export default {
         auditInfo: this.auditInfo,
         id: this.auditId,
         isPass: false,
-        type: 'position'
+        type: 'person'
       }
       this.auditRecordAction(param)
         .then(_ => {
@@ -637,7 +637,7 @@ export default {
 
 </script>
 <style lang="scss" scoped>
-  @import '@/assets/style/custom_c_info.scss';
+  @import '@/assets/style/custom_info.scss';
 
   .upload_wrap {
     .image_wrap,

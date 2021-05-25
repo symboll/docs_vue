@@ -39,7 +39,21 @@
             :width="item.width"  
           >
             <template slot-scope="scope">
-              <template >
+              <!-- <template >
+                <span>{{ scope.row[item.property] }}</span>
+              </template> -->
+               <template v-if="item.property === 'visitStatus'">
+                <span 
+                  :class="{
+                    'c_red': scope.row['visitStatus'] === 'init'
+                  }"
+                >{{ visitStatusMap[scope.row['visitStatus']]  }}</span>
+              </template>
+
+              <template v-else-if="item.property === 'status'">
+                <span>{{ statusMap[scope.row['status']]  }}</span>
+              </template>
+              <template  v-else>
                 <span>{{ scope.row[item.property] }}</span>
               </template>
             </template>
@@ -123,6 +137,8 @@ export default {
         { property: 'cardNo', label: '登记证号', width: ''},
         { property: 'deptName', label: '管辖单位', width: ''},
         { property: 'sysUserName', label: '责任民警', width: ''},
+        { property: 'status', label: '状态', width: ''},
+        { property: 'visitStatus', label: '走访记录状态', width: ''},
       ],
       removeId: 0,
 
@@ -137,7 +153,10 @@ export default {
 
       psList: state => state.policeStationList,
       policeList: state => state.policeList,
-      statusList: state => state.positionStatusList
+      statusList: state => state.positionStatusList,
+
+      statusMap: state => state.personal.statusMap,
+      visitStatusMap: state => state.personal.visitStatusMap,
     }),
     ...mapGetters([
       'buttonList'

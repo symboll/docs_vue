@@ -2,44 +2,43 @@ import {
   createOrUpdateApi,
   removeApi,
   getDetailApi,
-  getListApi,
+  getListApi2,
   auditApi,
   // importApi
 } from '@/api/template'
-import { exportApi }  from '../../api/common'
 
-const type = 'position'
+const type = 'info/person/reception'
 
 const state = {
-  positionList: [],
-  positionListTotal: 0,
-  positionItem: {}
+  receptionList: [],
+  receptionListTotal: 0,
+  receptionItem: {}
 }
 const mutations = {}
 const actions = {
-  getPositionListAction ({commit},params) {
+  getInfoPersonReceptionListAction ({commit},{params, id}) {
     return new Promise((resolve, reject)=> {
-      getListApi(type, params)
+      getListApi2(type, id , params)
         .then(res => {
-          commit('SET', { module:"position", key: "positionList", value: res.rows })
-          commit('SET', { module:"position", key: "positionListTotal", value: res.total })
+          commit('SET', { module:"reception", key: "receptionList", value: res.rows })
+          commit('SET', { module:"reception", key: "receptionListTotal", value: res.total })
         })
         .catch(err => reject(err))
     })
   },
 
-  getPositionDetailAction ({commit, dispatch},id) {
+  getInfoPersonReceptionDetailAction ({commit, dispatch},id) {
     return new Promise((resolve, reject)=> {
       getDetailApi(type, id)
         .then(res => {
-          commit('SET', { module:"position", key: "positionItem", value: res.data })
+          commit('SET', { module:"reception", key: "receptionItem", value: res.data })
           resolve(res.data)
         })
         .catch(err => reject(err))
     })
   },
 
-  createOrUpdatePositionAction ({commit},form) {
+  createOrUpdateInfoPersonReceptionAction ({commit},form) {
     return new Promise((resolve,reject)=> {
       createOrUpdateApi(type, form)
         .then(res => resolve(res))
@@ -47,27 +46,20 @@ const actions = {
     })
   },
 
-  removePositionAction ({commit}, id) {
+  removeInfoPersonReceptionAction ({commit}, id) {
     return new Promise((resolve,reject)=> {
       removeApi(type, id)
         .then(res => resolve(res))
         .catch(err => reject(err))
     })
   },
-  auditPositionAction ({commit}, data) {
+  auditInfoPersonReceptionAction ({commit}, data) {
     return new Promise((resolve,reject)=> {
       auditApi(type, data)
         .then(res => resolve(res))
         .catch(err => reject(err))
     })
   },
-  exportAction({commit}, params) {
-    return new Promise((resolve,reject) => {
-      exportApi(params)
-        .then(res => resolve(res))
-        .catch(err => reject(err))
-    })
-  }
 }
 const getters = {}
 

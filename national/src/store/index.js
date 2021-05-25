@@ -16,6 +16,9 @@ import statistical from './module/statistical'
 import dictionaries from './module/dictionaries'
 import infoOfficer from './module/info_officer'
 import infoSubmit from './module/info_submit'
+
+import assess from './module/assess'
+import reception from './module/reception'
 import plugin from './plugin'
 Vue.use(Vuex)
 
@@ -34,7 +37,9 @@ export default new Vuex.Store({
     dictionaries,
     infoOfficer,
     infoSubmit,
-    statistical
+    statistical,
+    assess,
+    reception
   },
   plugins: [
     plugin

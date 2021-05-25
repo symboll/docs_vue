@@ -1,6 +1,20 @@
 <template>
   <div class="c_wrap">
-    <section class="c_header">
+    <header class="c_header">
+      <div @click="handleBack" class="back">
+        <i class="el-icon-arrow-left"></i>
+        返回
+      </div>
+      <div class="c_header_btn_wrap">
+
+        <c-button
+          round iconType="ic_bianji"  @click="handleHeaderEdit">
+          <span>编辑</span>
+        </c-button>
+      </div>
+    </header>
+
+    <section class="c_body">
       <!-- <div class="title">阵地信息</div> -->
       <div class="c_header_item_info">
         <div v-for="item in showInfoList" :key="item.key" :class="{
@@ -9,103 +23,108 @@
           <template v-if="item.type ==='title'">
             <div>{{ item.label }}</div>
           </template>
+          <template v-else-if="item.custom">
+            <div>{{ item.label }}</div>
+            <div> {{ showValueMap(item.key,itemInfo[item.key] )}}</div>
+          </template>
           <template v-else>
             <div>{{ item.label }}</div>
             <div>{{ itemInfo[item.key] }}</div>
           </template>
         </div>
       </div>
-    </section>
-    <section class="c_middle">
-      <div class="c_middle_title">
-        <div class="title">走访记录</div>
-        <c-button flat iconType="ic_xinzeng" @click="handleCreate">
-          <span >新增</span>
-        </c-button>
-      </div>
-    </section>
-    <section class="c_body">
-      <el-table
-        class="c_table"
-        :data="list"
-        highlight-current-row
-        max-height="610"
-        style="width: 100%"
-      >
-        <el-table-column type="index" label="序号" wdith="100"></el-table-column>
-        <template v-for="item in tableHeader">
+
+      <section class="c_middle">
+        <div class="c_middle_title">
+          <div class="title">走访记录</div>
+          <c-button flat iconType="ic_xinzeng" @click="handleCreate">
+            <span >新增</span>
+          </c-button>
+        </div>
+      </section>
+      <section class="c_table_body">
+        <el-table
+          class="c_table"
+          :data="list"
+          highlight-current-row
+          max-height="610"
+          style="width: 100%"
+        >
+          <el-table-column type="index" label="序号" wdith="100"></el-table-column>
+          <template v-for="item in tableHeader">
+            <el-table-column
+              :key="item.property"
+              :label="item.label"
+              :width="item.width"  
+            >
+              <template slot-scope="scope">
+                <template v-if="item.property ==='status'">
+                  <span> {{ statusMap[scope.row['status']] }}</span>
+                </template>
+                <template v-else>
+                  <span>{{ scope.row[item.property] }}</span>
+                </template>
+              </template>
+            </el-table-column>
+          </template>
           <el-table-column
-            :key="item.property"
-            :label="item.label"
-            :width="item.width"  
-          >
+            fixed="right"
+            label="操作"
+            width="200">
             <template slot-scope="scope">
-              <template v-if="item.property ==='status'">
-                <span> {{ statusMap[scope.row['status']] }}</span>
+              <template v-if="scope.row.status === 'init'">
+                <el-button
+                  @click.native.prevent="handleAudit(scope.row)"
+                  type="text"
+                  size="small">
+                  审核
+                </el-button>
+                <span> | </span>
               </template>
-              <template v-else>
-                <span>{{ scope.row[item.property] }}</span>
+              <template v-if="scope.row.status === 'finish'">
+                <el-button
+                  @click.native.prevent="handleEvaluate(scope.row)"
+                  type="text"
+                  size="small">
+                  评价
+                </el-button>
+                <span> | </span>
               </template>
+              <el-button
+                @click.native.prevent="handleDetail(scope.row)"
+                type="text"
+                size="small">
+                详情
+              </el-button>
+              <span> | </span>
+              <el-button
+                @click.native.prevent="handleEdit(scope.row)"
+                type="text"
+                size="small">
+                编辑
+              </el-button>
+              <span> | </span>
+              <el-button
+                @click.native.prevent="handleRemove(scope.row)"
+                type="text"
+                size="small">
+                删除
+              </el-button>
             </template>
           </el-table-column>
-        </template>
-        <el-table-column
-          fixed="right"
-          label="操作"
-          width="200">
-          <template slot-scope="scope">
-            <template v-if="scope.row.status === 'init'">
-              <el-button
-                @click.native.prevent="handleAudit(scope.row)"
-                type="text"
-                size="small">
-                审核
-              </el-button>
-              <span> | </span>
-            </template>
-            <template v-if="scope.row.status === 'finish'">
-              <el-button
-                @click.native.prevent="handleEvaluate(scope.row)"
-                type="text"
-                size="small">
-                评价
-              </el-button>
-              <span> | </span>
-            </template>
-            <el-button
-              @click.native.prevent="handleDetail(scope.row)"
-              type="text"
-              size="small">
-              详情
-            </el-button>
-            <span> | </span>
-            <el-button
-              @click.native.prevent="handleEdit(scope.row)"
-              type="text"
-              size="small">
-              编辑
-            </el-button>
-            <span> | </span>
-            <el-button
-              @click.native.prevent="handleRemove(scope.row)"
-              type="text"
-              size="small">
-              删除
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+        </el-table>
 
-      <el-pagination
-        class="c_pagination"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :current-page="pagination.pageNo"
-        :page-sizes="[10, 20, 30, 40]"
-        :page-size="pagination.pageSize"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="total">
-      </el-pagination>
+        <el-pagination
+          class="c_pagination"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="pagination.pageNo"
+          :page-sizes="[10, 20, 30, 40]"
+          :page-size="pagination.pageSize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="total">
+        </el-pagination>
+      </section>
     </section>
     <c-t-dialog
       :visible="visible"
@@ -131,7 +150,7 @@
               <c-upload-btn
                 @change="handleImport"
                 :imageLth="recordInfo.attachmentList && recordInfo.attachmentList.length"
-                :videoLth="recordInfo.video && recordInfo.video.length"
+                :videoLth="recordInfo.videoList && recordInfo.videoList.length"
               ></c-upload-btn>
               <div class="image_wrap" v-if="recordInfo.attachmentList && recordInfo.attachmentList.length > 0">
                 <div v-for="(i,index) in recordInfo.attachmentList" :key="i" class="upload_item">
@@ -142,8 +161,8 @@
                   <i @click="deleteItem(index, 'image')" class="el-icon-error"></i>
                 </div>
               </div>
-              <div class="video_wrap" v-if="recordInfo.video && recordInfo.video.length > 0">
-               <div v-for="(i,index) in recordInfo.video" :key="i" class="upload_item">     
+              <div class="video_wrap" v-if="recordInfo.videoList && recordInfo.videoList.length > 0">
+               <div v-for="(i,index) in recordInfo.videoList" :key="i" class="upload_item">     
                   <video 
                     :src="i"  
                     class="video_style"
@@ -225,8 +244,8 @@
                     >
                   </div>
                 </div>
-                <div class="video_wrap" v-if="recordInfo.video && recordInfo.video.length > 0">
-                <div v-for="(i,index) in recordInfo.video" :key="i" class="upload_item">     
+                <div class="video_wrap" v-if="recordInfo.videoList && recordInfo.videoList.length > 0">
+                <div v-for="(i,index) in recordInfo.videoList" :key="i" class="upload_item">     
                     <video 
                       :src="i"  
                       class="video_style"
@@ -289,9 +308,9 @@ export default {
         { key: "cardNo", label: "登记证号" },
         { key: "owner", label: "管理负责人" },
         { key: "address", label: "地址" },
-        { key: "orgId", label: "管辖单位" },
-        { key: "sysUserId", label: "责任民警" },
-        { key: "visitFrequency", label: "走访频率" },
+        { key: "orgId", label: "管辖单位", custom: true },
+        { key: "sysUserId", label: "责任民警", custom: true },
+        { key: "visitFrequency", label: "走访频率", custom: true },
       ],
       visible: false,
       removeVisible: false,
@@ -304,6 +323,7 @@ export default {
       optionlist: [
         { typeCode: "场所情况评估", key: "tEvaluationList"  },
         { typeCode: "评价", key: "evaluationList"  },
+        { typeCode: "走访频率", key: "visitFrequencyList"  },
       ]
     }
   },
@@ -321,7 +341,11 @@ export default {
       statusMap : state => state.record.statusMap,
 
       tEvaluationList: state => state.tEvaluationList,
-      evaluationList: state => state.evaluationList
+      evaluationList: state => state.evaluationList,
+      visitFrequencyList: state => state.visitFrequencyList,
+
+      psList: state => state.policeStationList,
+      policeList: state => state.policeList,
     })
   },
   methods: {
@@ -333,17 +357,49 @@ export default {
       'auditRecordAction',
       'getRecordDetailAction',
       'commonUploadAction',
-      'getDicItemsAction'
+      'getDicItemsAction',
+      'getPoliceListAction',
+      'getPoliceStationListAction'
     ]),
     ...mapMutations([
-      'RECORD_ITEM_UPDATE'
+      'RECORD_ITEM_UPDATE',
+      'SET'
     ]),
-    computedFormat(url) {
-      const imgPattern =  /\.(jpg|png|gif|jpeg)$/;
-      const videoPattern = /\.(mp4|avi|wmv|mov|mpeg|mpg|rm|ram|swf|flv)$/;
+    // computedFormat(url) {
+    //   const imgPattern =  /\.(jpg|png|gif|jpeg)$/;
+    //   const videoPattern = /\.(mp4|avi|wmv|mov|mpeg|mpg|rm|ram|swf|flv)$/;
 
-      if(imgPattern.test(url)) return 'img'
-      else if(videoPattern.test(url)) return 'video'
+    //   if(imgPattern.test(url)) return 'img'
+    //   else if(videoPattern.test(url)) return 'video'
+    // },
+    handleBack () {
+      this.$router.go(-1)
+    },
+    handleHeaderEdit () {
+      const { id } = this.$route.query
+      this.$router.push({ 
+        name: "EmphasisPositionEdit",
+        query: { id }
+      })
+    },
+    showValueMap (type, id) {
+      let arr  = []
+      switch (type) {
+        case 'orgId':
+          arr = this.psList
+          break;
+        case 'sysUserId':
+          arr = this.policeList
+          break;
+        case 'visitFrequency':
+          arr = this.visitFrequencyList
+          break;
+        default:
+          arr = []
+          break;
+      }
+      const item = arr.find(item => item.id === id) || {}
+      return item.name
     },
     deleteItem (index, type) {
       this.RECORD_ITEM_UPDATE({index, type})
@@ -351,12 +407,18 @@ export default {
     init () {
       const { id } = this.$route.query
       this.getPositionDetailAction(id)
+        .then(res => {
+          this.getPoliceListAction(res.orgId)
+        })
         .catch(err => console.log(err))
 
       this.optionlist.forEach(item => {
         this.getDicItemsAction(item)
           .catch(err => console.log(err))
       })
+
+      this.getPoliceStationListAction()
+        .catch(err => console.log(err))   
     },
     searchFn () {
       const { id } = this.$route.query
@@ -430,7 +492,7 @@ export default {
     handleClose () {
       this.SET({ module: "record", key: "recordItem", value: {
         attachmentList:[],
-        video: []
+        videoList: []
       }})
       this.title = ''
       this.visible = false
@@ -524,7 +586,9 @@ export default {
 </script>
 <style lang="scss" scoped>
   @import '@/assets/style/custom_info.scss';
-
+  .c_table_body {
+    height: calc(100vh - 345px) !important;
+  }
   .upload_wrap {
     .image_wrap,
     .video_wrap {

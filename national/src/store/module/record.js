@@ -18,7 +18,7 @@ const state = {
   recordListTotal: 0,
   recordItem: {
     attachmentList:[],
-    video: []
+    videoList: []
   },
 
   statusMap: {
@@ -30,7 +30,7 @@ const state = {
 
 const mutations = {
   RECORD_ITEM_UPDATE (state, { file, type, index }) {
-    let t = type === 'video' ? "video": "attachmentList"
+    let t = type === 'video' ? "videoList": "attachmentList"
     if(file && index == undefined) {
       if(!state.recordItem[t]) {
         state.recordItem[t] = []

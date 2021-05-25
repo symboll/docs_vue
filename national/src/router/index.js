@@ -7,8 +7,8 @@ import store from '@/store'
 Vue.use(VueRouter)
 
 const router = new VueRouter({
-  // mode: 'history',
-  mode: "hash",
+  mode: 'history',
+  // mode: "hash",
   base: process.env.BASE_URL,
   routes
 })
@@ -22,20 +22,20 @@ router.beforeEach((to, from, next) => {
   
   if(accountName) {
     if(to.name ==='login') {
-      next({ name: "TodoList" })
+      next({ name: "Home" })
     }else if(authCodeList.includes(to.name)) {
       next()
     }else {
-      next({ name: "TodoList" })
+      next({ name: "Home" })
     }
   }else if(token && token !== '') {
     store.dispatch('getCurrentUserInfoAction').then(res => {
       if (to.name === 'login') {
-        next({ name: 'TodoList' })
+        next({ name: 'Home' })
       } else if(res.authCodeList.includes(to.name)){ 
         next() 
       } else {
-        next({ name: 'TodoList' })
+        next({ name: 'Home' })
       }
     }).catch(_ => {
       setToken('')

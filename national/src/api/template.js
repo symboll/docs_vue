@@ -81,6 +81,13 @@ export const getDetailApi = (type, id)=> {
   })
 }
 
+export const getListApi2 = (type, id, params)=> {
+  return axios.request({
+    url: `/api/${type}/${version}/page/${id}`,
+    params
+  })
+}
+
 
 /**
  * 撤销报备
@@ -92,5 +99,13 @@ export const getDetailApi = (type, id)=> {
   return axios.request({
     url: `/api/${type}/${version}/cancel/${id}`,
     method: "POST",
+  })
+}
+
+
+export const todolistApi  = (params) => {
+  return axios.request({
+    url: `/api/agenda/${version}/index/page`,
+    params
   })
 }

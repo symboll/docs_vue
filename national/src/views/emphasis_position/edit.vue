@@ -33,10 +33,18 @@
           >            
             <template v-if="item.option">
               <el-option 
+                v-if="item.key !== 'type'"
                 v-for="cur in computedList(item.option)"
                 :key="cur.id"
                 :label="cur.name"
                 :value="cur.id"
+              />
+              <el-option 
+                v-else
+                v-for="cur in computedList(item.option)"
+                :key="cur.id"
+                :label="cur.name"
+                :value="cur.name"
               />
             </template>
           </component>
@@ -53,7 +61,7 @@ export default {
   data () {
     return {
       createOrEditForm: [
-        { key: 'title1', type: "div" , className: "title", context: "信息员信息:" },
+        { key: 'title1', type: "div" , className: "title", context: "阵地信息:" },
         { label: '阵地名称', key: 'name', type: 'el-input' },
         { label: '种类', key: 'type', type: 'el-select', option: "typeList" },
         { label: '登记证号', key: 'cardNo',  type: 'el-input' },
@@ -139,13 +147,11 @@ export default {
         if (valid) {
           const deptName = (this.psList.find(item => item.id === this.itemInfo.orgId) || {}).name
           const sysUserName = (this.policeList.find(item => item.id === this.itemInfo.sysUserId) || {}).name
-          const type = (this.typeList.find(item => item.id === this.itemInfo.type)|| {}).name
 
           this.createOrUpdatePositionAction({
             ...this.itemInfo,
             deptName,
             sysUserName,
-            type
           })
             .then(res => {
               this.$message.success(this.itemInfo.id ?'修改成功!' : '创建成功！')

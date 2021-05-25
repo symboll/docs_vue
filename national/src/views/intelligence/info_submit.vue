@@ -67,7 +67,15 @@
               </el-button>
               <span> | </span>
             </template>
-            
+
+            <el-button
+              @click.native.prevent="handleView(scope.row)"
+              type="text"
+              size="small">
+              详情
+            </el-button>
+            <span> | </span>
+
             <template v-if="buttonList('InfoSubmit').includes('edit')">
               <el-button
                 @click.native.prevent="handleEdit(scope.row)"
@@ -228,7 +236,13 @@ export default {
         .then(_ => this.getInfoSubmitListAction())
         .catch(err => this.$message.error('上传失败' + err))
     },
-
+    handleView (row) {
+      this.getPoliceListAction(row.orgId)
+      this.$router.push({ 
+        name: "InfoSubmitInfo",
+        query: { id: row.id }
+      })
+    },
     handleEdit (row) {
       this.getPoliceListAction(row.orgId)
       this.$router.push({ 
