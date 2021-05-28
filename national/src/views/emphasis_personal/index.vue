@@ -250,6 +250,7 @@ export default {
       visitStatusMap: state => state.personal.visitStatusMap,
 
       organTypeList: state => state.organTypeList,
+      currentUser: state => state.user.currentUser
     }),
     ...mapGetters([
       'buttonList'

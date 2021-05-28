@@ -1,7 +1,9 @@
 <template>
   <div class="c_wrap">
     <header class="c_header">
-      <span>任务下派完成情况统计</span> 
+      <span>任务下派完成情况统计 （{{ TypeMap[type] }}）</span> 
+
+      <el-button type="text" @click="handleChange">点击切换至 {{ TypeMap[otherType] }} </el-button>
     </header>
     <section class="c_body">
       <c-search 
@@ -65,6 +67,11 @@ import { mapState, mapActions } from 'vuex'
 export default {
   data() {
     return {
+      TypeMap: {
+        position: '阵地',
+        person: '人员'
+      },
+      type: 'person',
       pagination: {
         pageNo: 1,
         pageSize: 10
@@ -106,7 +113,16 @@ export default {
       list: state => state.statistical.finishedList,
       total: state => state.statistical.finishedTotal,
       psList: state => state.policeStationList,
-    })
+    }),
+    otherType () {
+      // this.TypeMap,
+      // this.type
+      const keys = Object.keys(this.TypeMap)
+      const item = keys.find(i => i !== this.type && i!=='')
+      console.log(item)
+
+      return item
+    }
   },
   methods: {
     ...mapActions([
@@ -117,9 +133,23 @@ export default {
     searchFn () {
       const params = {
         ...this.pagination,
-        ...this.searchObj
+        ...this.searchObj,
+        type: this.type
       }
       this.getFinishedAction(params)
+    },
+    handleChange () {
+      this.type === 'person' ? this.type = 'position': this.type = 'person'
+      let label;
+      if(this.type === 'person') {
+        label = '重点人员数量'
+      }else if(this.type === 'position') {
+        label = '重点阵地数量'
+      }
+      this.tableHeader.splice(1,1, {
+        property: 'personCount', label, width: '',
+      })
+      this.searchFn()
     },
     handleSearch (searchObj) {
       this.searchObj = searchObj

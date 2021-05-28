@@ -129,8 +129,10 @@ export default {
       this.addAuthToRoleAction(params)
         .then(_ => {
           this.getRoleDetailAction(this.selectedRoleId)
+          this.$message.success('修改成功!')
+          this.$router.go(-1)
         })
-        .catch(err => console.log(err))
+        .catch(err => this.$message.error(err))
 
     }
   }

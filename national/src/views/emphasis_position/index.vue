@@ -73,7 +73,8 @@
               </el-button>
               <span> | </span>
             </template>
-            <template v-if="buttonList('EmphasisPosition').includes('tf')">
+            <template v-if="buttonList('EmphasisPosition').includes('tf')">              
+            <!-- <template v-if="currentUser.userType === 4 && scope.row.status === 'finish' "> -->
               <el-button
                 @click.native.prevent="handleComplete(scope.row)"
                 type="text"
@@ -83,6 +84,7 @@
               <span> | </span>
             </template>
             <template v-if="buttonList('EmphasisPosition').includes('tfAudit')">
+            <!-- <template v-if="currentUser.userType === 3 && scope.row.status === 'finish'"> -->
               <el-button
                 @click.native.prevent="handleCompleteAudit(scope.row)"
                 type="text"
