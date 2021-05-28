@@ -4,6 +4,8 @@ import {
   getDetailApi,
   getListApi,
   auditApi,
+  completeApi,
+  completeAuditApi
   // importApi
 } from '@/api/template'
 import { exportApi }  from '../../api/common'
@@ -50,6 +52,20 @@ const actions = {
   removePositionAction ({commit}, id) {
     return new Promise((resolve,reject)=> {
       removeApi(type, id)
+        .then(res => resolve(res))
+        .catch(err => reject(err))
+    })
+  },
+  completeAuditPositionAction ({commit}, data) {
+    return new Promise((resolve,reject)=> {
+      completeAuditApi(type, data)
+        .then(res => resolve(res))
+        .catch(err => reject(err))
+    })
+  },
+  completePositionAction ({commit}, data) {
+    return new Promise((resolve,reject)=> {
+      completeApi(type, data)
         .then(res => resolve(res))
         .catch(err => reject(err))
     })

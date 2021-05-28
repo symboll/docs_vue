@@ -5,7 +5,7 @@ export default [
     path: '/',
     name: '',
     component: Layout,
-    redirect: () => '/todolist',
+    redirect: () => '/todolist/home',
     children: [
       {
         path: '/todolist',

@@ -72,7 +72,7 @@
             label="操作"
             width="200">
             <template slot-scope="scope">
-              <template v-if="scope.row.status === 'init'">
+              <template v-if="scope.row.status === 'init' && buttonList('Record').includes('audit')">
                 <el-button
                   @click.native.prevent="handleAudit(scope.row)"
                   type="text"
@@ -81,9 +81,10 @@
                 </el-button>
                 <span> | </span>
               </template>
-              <template v-if="scope.row.status === 'finish'">
+              <template v-if="(currentUser.userType === 3 && scope.row.status !== 'finish') 
+                          || (currentUser.userType === 1 && scope.row.status === 'finish')">
                 <el-button
-                  @click.native.prevent="handleEvaluate(scope.row)"
+                  @click.native.prevent="handleEvaluate(scope.row) && buttonList('Record').includes('evaluate')"
                   type="text"
                   size="small">
                   评价
@@ -241,6 +242,7 @@
                     <img
                       :src="i" alt=""
                       class="img_style"
+                      @click="handleClick('image', i)"
                     >
                   </div>
                 </div>
@@ -249,6 +251,7 @@
                     <video 
                       :src="i"  
                       class="video_style"
+                      @click="handleClick('video',i)"
                     ></video>
                   </div>
                 </div>
@@ -258,12 +261,44 @@
         </div>
       </section>
     </c-t-dialog>
+
+    <c-t-dialog
+      :visible="viewVisible"
+      :title="viewType === 'video'? '查看视频': '查看图片'"
+      :width="viewType === 'video'? '520px': '360px' "
+      @confirm="viewClose"
+      @close="viewClose"
+    >
+      <template v-if="viewType === 'video'">
+        <video class="big_video" :src="viewUrl" controls autoplay></video>
+      </template>
+      <template v-else>
+        <img class="big_image" :src="viewUrl" alt="">
+      </template>
+    </c-t-dialog>
+
+    <c-t-dialog
+      :visible="evaluateVisable"
+      title="评价"
+      @confirm="evaluateConfirm"
+      @close="evaluateClose"
+    >
+      <el-select v-model="evaluateValue" @change="evaluateChange">
+        <el-option 
+          v-for="item in evaluationList" 
+          :key="item.id"
+          :label="item.name"
+          :value="item.name"
+        >
+        </el-option>
+      </el-select>
+    </c-t-dialog>
     
   </div>
 </template>
 
 <script>
-import { mapState, mapActions, mapMutations } from 'vuex'
+import { mapState, mapActions, mapMutations, mapGetters } from 'vuex'
 import CUploadBtn from '@/components/c-upload-btn'
 export default {
   components: {
@@ -324,7 +359,14 @@ export default {
         { typeCode: "场所情况评估", key: "tEvaluationList"  },
         { typeCode: "评价", key: "evaluationList"  },
         { typeCode: "走访频率", key: "visitFrequencyList"  },
-      ]
+      ],
+      viewVisible: false,
+      viewUrl:'',
+      viewType: '',
+
+      evaluateVisable: false,
+      evaluateId: '',
+      evaluateValue: ''
     }
   },
   mounted() {
@@ -346,7 +388,11 @@ export default {
 
       psList: state => state.policeStationList,
       policeList: state => state.policeList,
-    })
+      currentUser: state => state.user.currentUser
+    }),
+    ...mapGetters([
+      'buttonList'
+    ])
   },
   methods: {
     ...mapActions([
@@ -359,7 +405,8 @@ export default {
       'commonUploadAction',
       'getDicItemsAction',
       'getPoliceListAction',
-      'getPoliceStationListAction'
+      'getPoliceStationListAction',
+      'evaluationAction'
     ]),
     ...mapMutations([
       'RECORD_ITEM_UPDATE',
@@ -372,6 +419,15 @@ export default {
     //   if(imgPattern.test(url)) return 'img'
     //   else if(videoPattern.test(url)) return 'video'
     // },
+    viewClose () {
+      this.viewType = ''
+      this.viewVisible = false
+    },
+    handleClick (type, url) {
+      this.viewType = type
+      this.viewVisible = true
+      this.viewUrl = url
+    },
     handleBack () {
       this.$router.go(-1)
     },
@@ -546,7 +602,33 @@ export default {
         .catch(err => console.log(err))
     },
     handleEvaluate (row) {
-
+      this.evaluateId = row.id
+      this.evaluateVisable = true
+    },
+    evaluateChange (event) {
+      this.evaluateValue = event
+    },
+    evaluateConfirm () {
+      if(this.evaluateValue === '') {
+        this.$message.error('请选择评价')
+        return
+      }else {
+        const params = {
+          evaluation: this.evaluateValue,
+          id: this.evaluateId,
+          type: "position"
+        }
+        this.evaluationAction(params)
+          .then(res => {
+            this.evaluateClose()
+            this.searchFn()
+          })
+          .catch(err => this.$message.error(err))
+      }
+    },
+    evaluateClose () {
+      this.evaluateId = ''
+      this.evaluateVisable = false
     },
 
     handleDetail (row) {
@@ -633,5 +715,13 @@ export default {
       justify-content: flex-end;
     }
   }
+}
+.big_image {
+  width: 320px;
+  height: 320px;
+}
+.big_video {
+  width: 480px;
+  height: 320px;
 }
 </style>

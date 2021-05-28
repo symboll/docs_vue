@@ -48,6 +48,9 @@
               <template v-else-if="item.property === 'status'">
                 <span>{{ statusMap[scope.row['status']]  }}</span>
               </template>
+              <template v-else-if="item.property === 'organizationType'">
+                <span>{{ organizationTypeMap(scope.row['organizationType']) }}</span>
+              </template>
               <template  v-else>
                 <span>{{ scope.row[item.property] }}</span>
               </template>
@@ -59,6 +62,24 @@
           label="操作"
           width="200">
           <template slot-scope="scope">
+            <template v-if="buttonList('EmphasisPersonal').includes('tf')">
+              <el-button
+                @click.native.prevent="handleComplete(scope.row)"
+                type="text"
+                size="small">
+                办结
+              </el-button>
+              <span> | </span>
+            </template>
+            <template v-if="buttonList('EmphasisPersonal').includes('tfAudit')">
+              <el-button
+                @click.native.prevent="handleCompleteAudit(scope.row)"
+                type="text"
+                size="small">
+                办结审核
+              </el-button>
+              <span> | </span>
+            </template>
             <template v-if="scope.row.status === 'init' && buttonList('EmphasisPersonal').includes('audit')">
               <el-button
                 @click.native.prevent="handleAudit(scope.row)"
@@ -135,6 +156,42 @@
         <el-button @click="handleRejectAduit">拒 绝</el-button>
       </span>
     </el-dialog>
+
+    <el-dialog
+      title="办结审核"
+      :visible.sync="completeAuditVisible"
+      width="460px"
+    >
+      <section class="aduit_dialog_body">
+        <div class="title">审核意见</div>
+        <div class="radio_wrap">
+          <el-radio v-model="isHire" :label="true">录用</el-radio>
+          <el-radio v-model="isHire" :label="false">不录用</el-radio>
+        </div>
+        <el-input 
+          type="textarea" 
+          v-model="completeAuditInfo" 
+          placeholder="请输入"
+          :autosize="{ minRows: 4, maxRows: 8}"
+        ></el-input>
+        <div class="notes">注：若拒绝审批通过，需输入审核意见</div>
+      </section>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="completeResolveAudit">通 过</el-button>
+        <el-button @click="completeRejectAduit">返 回</el-button>
+      </span>
+    </el-dialog>
+
+    <c-t-dialog    
+      :visible="completeVisible"
+      title="提交办结"
+      @confirm="completeConfirm"
+      @close="completeClose"
+    >
+      <div class="complete_wrap">
+        是否确认提交办结
+      </div>
+    </c-t-dialog>
   </div>
 </template>
 
@@ -168,7 +225,15 @@ export default {
 
       auditId: 0,
       auditVisible: false,
-      auditInfo: ''
+      auditInfo: '',
+
+      completeAuditId: '',
+      completeAuditVisible: false,
+      completeAuditInfo: '',
+      isHire: true,
+
+      completeId: '',
+      completeVisible: false
     }
   },
   computed: {
@@ -183,6 +248,8 @@ export default {
 
       statusMap: state => state.personal.statusMap,
       visitStatusMap: state => state.personal.visitStatusMap,
+
+      organTypeList: state => state.organTypeList,
     }),
     ...mapGetters([
       'buttonList'
@@ -198,20 +265,34 @@ export default {
       'createOrUpdatePersonalAction',
       'removePersonalAction',
       'auditPersonalAction',
+      'completePersonalAction',
+      'completeAuditPersonalAction',
 
       "getPoliceStationListAction",
       "getPoliceListAction",
-      'personalImportAction'
+      'personalImportAction',
+      'getDicItemsAction'
     ]),
     ...mapMutations([
       "SET"
     ]),
-
+    organizationTypeMap(value) {
+      if(isNaN(Number(value))) {
+        return value
+      }else {
+        const name = (this.organTypeList.find(item => item.id === value) || {}).name
+        return name
+      }
+      return ''
+    },
     init () {
       this.getPersonalListAction()
         .catch(err => console.log(err))
       this.getPoliceStationListAction()
         .catch(err => console.log(err))
+
+      this.getDicItemsAction({ typeCode: "组织类别", key: "organTypeList"  })
+          .catch(err => console.log(err))
     },
     handleChangepoliceStation (orgId) {
       this.getPoliceListAction(orgId).catch(err => console.log(err))
@@ -271,6 +352,70 @@ export default {
         .catch(err => this.$message.error(err))
     },
 
+// ------
+    handleComplete (row) {
+      this.completeId = row.id
+      this.completeVisible = true
+    },
+    completeConfirm () {
+      this.completePersonalAction(this.completeId)
+        .then(res => {
+          this.completeClose()
+          this.searchFn()
+        })
+        .catch(err => console.log(err))
+    },
+    completeClose() {
+      this.completeId = ''
+      this.completeVisible = false
+    },
+
+    handleCompleteAudit (row) {
+      this.completeAuditId = row.id,
+      this.completeAuditVisible = true
+    },
+    completeResolveAudit () {
+      const param = {
+        auditInfo: this.completeAuditInfo,
+        id: this.completeAuditId,
+        isPass: true,
+        isHire: this.isHire,
+        type: 'person'
+      }
+      this.completeAuditPersonalAction(param)
+        .then(_ => {
+          this.completeAuditInfo = ''
+          this.completeAuditId = 0
+          this.completeAuditVisible = false
+          this.isHire = true
+          this.searchFn()
+        })
+        .catch(err => console.log(err))
+    },
+    
+    completeRejectAduit () {
+       if(this.auditInfo === '') {
+        this.$message.error('拒绝审批通过，需输入审核意见')
+        return
+      }
+      const param  = {
+        auditInfo: this.completeAuditInfo,
+        id: this.completeAuditId,
+        isPass: false,
+        isHire: this.isHire,
+        type: 'person'
+      }
+      this.completeAuditPersonalAction(param)
+        .then(_ => {
+          this.completeAuditInfo = ''
+          this.completeAuditId = 0
+          this.completeAuditVisible = false
+          this.isHire = true
+          this.searchFn()
+        })
+        .catch(err => console.log(err))
+    },
+// ------
 
 
 
@@ -343,4 +488,26 @@ export default {
   @import '@/assets/style/custom.scss';
   @import '@/assets/style/file_upload_button.scss';
 
+.aduit_dialog_body {
+  display: flex;
+  flex-direction: column;
+  .title {
+    margin-bottom: 10px;
+  }
+  .radio_wrap {
+    display: flex;
+    height: 40px;
+    align-items: center;
+  }
+  .notes {
+    margin-top: 10px;
+  }
+}
+
+.complete_wrap {
+  height: 120px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 </style>

@@ -26,3 +26,17 @@ export const taskDownApi = (id) => {
     method:"POST"
   })
 }
+
+
+/**
+ * 评论
+ * @param {*} data 
+ * @returns 
+ */
+export const evaluationApi = (data) => {
+  return axios.request({
+    url: `/api/record/${version}/evaluation`,
+    method: "POST",
+    data
+  })
+}

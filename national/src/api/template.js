@@ -103,6 +103,34 @@ export const getListApi2 = (type, id, params)=> {
 }
 
 
+/**
+ * 办结
+ * @param {*} type
+ * @param {*} id
+ * @returns 
+ */
+export const completeApi = (type, id) => {
+  return axios.request({
+    url: `/api/${type}/${version}/transferred/${id}`,
+    method: "POST"
+  })
+}
+
+/**
+ * 办结审核
+ * @param {*} type 
+ * @param {*} params 
+ * @returns 
+ */
+export const completeAuditApi = (type, data) => {
+  return axios.request({
+    url: `/api/${type}/${version}/transferred/audit`,
+    method: "POST",
+    data
+  })
+}
+
+
 export const todolistApi  = (params) => {
   return axios.request({
     url: `/api/agenda/${version}/index/page`,

@@ -64,6 +64,34 @@
           label="操作"
           width="200">
           <template slot-scope="scope">
+            <template v-if="buttonList('EmphasisPosition').includes('audit')">
+              <el-button
+                @click.native.prevent="handleAudit(scope.row)"
+                type="text"
+                size="small">
+                审核
+              </el-button>
+              <span> | </span>
+            </template>
+            <template v-if="buttonList('EmphasisPosition').includes('tf')">
+              <el-button
+                @click.native.prevent="handleComplete(scope.row)"
+                type="text"
+                size="small">
+                办结
+              </el-button>
+              <span> | </span>
+            </template>
+            <template v-if="buttonList('EmphasisPosition').includes('tfAudit')">
+              <el-button
+                @click.native.prevent="handleCompleteAudit(scope.row)"
+                type="text"
+                size="small">
+                办结审核
+              </el-button>
+              <span> | </span>
+            </template>
+
             <template v-if="buttonList('EmphasisPosition').includes('info')">
               <el-button
                 @click.native.prevent="handleDetail(scope.row)"
@@ -109,6 +137,64 @@
       @confirm="handleConfirm"
       @close="handleClose"
     ></c-c-dialog> 
+
+
+    <el-dialog
+      title="审核"
+      :visible.sync="auditVisible"
+      width="460px"
+    >
+      <section class="aduit_dialog_body">
+        <div class="title">审核意见</div>
+        <el-input 
+          type="textarea" 
+          v-model="auditInfo" 
+          placeholder="请输入"
+          :autosize="{ minRows: 4, maxRows: 8}"
+        ></el-input>
+        <div class="notes">注：若拒绝审批通过，需输入审核意见</div>
+      </section>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="handleResolveAudit">通 过</el-button>
+        <el-button @click="handleRejectAduit">返 回</el-button>
+      </span>
+    </el-dialog>
+
+    <el-dialog
+      title="办结审核"
+      :visible.sync="completeAuditVisible"
+      width="460px"
+    >
+      <section class="aduit_dialog_body">
+        <div class="title">审核意见</div>
+        <div class="radio_wrap">
+          <el-radio v-model="isHire" :label="true">录用</el-radio>
+          <el-radio v-model="isHire" :label="false">不录用</el-radio>
+        </div>
+        <el-input 
+          type="textarea" 
+          v-model="completeAuditInfo" 
+          placeholder="请输入"
+          :autosize="{ minRows: 4, maxRows: 8}"
+        ></el-input>
+        <div class="notes">注：若拒绝审批通过，需输入审核意见</div>
+      </section>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="completeResolveAudit">通 过</el-button>
+        <el-button @click="completeRejectAduit">返 回</el-button>
+      </span>
+    </el-dialog>
+
+    <c-t-dialog    
+      :visible="completeVisible"
+      title="提交办结"
+      @confirm="completeConfirm"
+      @close="completeClose"
+    >
+      <div class="complete_wrap">
+        是否确认提交办结
+      </div>
+    </c-t-dialog>
   </div>
 </template>
 
@@ -143,6 +229,18 @@ export default {
       removeId: 0,
 
       visible: false,
+
+      auditId: '',
+      auditVisible: false,
+      auditInfo: '',
+
+      completeAuditId: '',
+      completeAuditVisible: false,
+      completeAuditInfo: '',
+      isHire: true,
+
+      completeId: '',
+      completeVisible: false
     }
   },
   computed: {
@@ -172,6 +270,8 @@ export default {
       'createOrUpdatePositionAction',
       'removePositionAction',
       'auditPositionAction',
+      'completePositionAction',
+      'completeAuditPositionAction',
 
       "getPoliceStationListAction",
       "getPoliceListAction",
@@ -199,6 +299,109 @@ export default {
     handleExport() {
       window.location.href = `${baseURL}/api/position/v1/toExcel?Authorization=${getToken()}`
     },
+    handleAudit (row) {
+      this.auditId = row.id
+      this.auditVisible = true
+    },
+    handleResolveAudit () {
+      const param = {
+        auditInfo: this.auditInfo,
+        id: this.auditId,
+        isPass: true,
+        type: 'position'
+      }
+      this.auditPositionAction(param)
+        .then(_ => {
+          this.auditInfo = ''
+          this.auditId = 0
+          this.auditVisible = false
+          this.searchFn()
+        })
+        .catch(err => console.log(err))
+    },
+    handleRejectAduit () {
+      if(this.auditInfo === '') {
+        this.$message.error('拒绝审批通过，需输入审核意见')
+        return
+      }
+      const param  = {
+        auditInfo: this.auditInfo,
+        id: this.auditId,
+        isPass: false,
+        type: 'position'
+      }
+      this.auditPositionAction(param)
+        .then(_ => {
+          this.auditInfo = ''
+          this.auditId = 0
+          this.auditVisible = false
+          this.searchFn()
+        })
+        .catch(err => console.log(err))
+    },
+    handleComplete (row) {
+      this.completeId = row.id
+      this.completeVisible = true
+    },
+    completeConfirm () {
+      this.completePositionAction(this.completeId)
+        .then(res => {
+          this.completeClose()
+          this.searchFn()
+        })
+        .catch(err => console.log(err))
+    },
+    completeClose() {
+      this.completeId = ''
+      this.completeVisible = false
+    },
+
+    handleCompleteAudit (row) {
+      this.completeAuditId = row.id,
+      this.completeAuditVisible = true
+    },
+    completeResolveAudit () {
+      const param = {
+        auditInfo: this.completeAuditInfo,
+        id: this.completeAuditId,
+        isPass: true,
+        isHire: this.isHire,
+        type: 'position'
+      }
+      this.completeAuditPositionAction(param)
+        .then(_ => {
+          this.completeAuditInfo = ''
+          this.completeAuditId = 0
+          this.completeAuditVisible = false
+          this.isHire = true
+          this.searchFn()
+        })
+        .catch(err => console.log(err))
+    },
+    
+    completeRejectAduit () {
+       if(this.auditInfo === '') {
+        this.$message.error('拒绝审批通过，需输入审核意见')
+        return
+      }
+      const param  = {
+        auditInfo: this.completeAuditInfo,
+        id: this.completeAuditId,
+        isPass: false,
+        isHire: this.isHire,
+        type: 'position'
+      }
+      this.completeAuditPositionAction(param)
+        .then(_ => {
+          this.completeAuditInfo = ''
+          this.completeAuditId = 0
+          this.completeAuditVisible = false
+          this.isHire = true
+          this.searchFn()
+        })
+        .catch(err => console.log(err))
+    },
+
     handleDetail(row) {
       this.$router.push({ 
         name: "EmphasisPositionInfo" , 
@@ -267,4 +470,26 @@ export default {
 <style lang='scss' scoped>
   @import '@/assets/style/custom.scss';
 
+.aduit_dialog_body {
+  display: flex;
+  flex-direction: column;
+  .title {
+    margin-bottom: 10px;
+  }
+  .radio_wrap {
+    display: flex;
+    height: 40px;
+    align-items: center;
+  }
+  .notes {
+    margin-top: 10px;
+  }
+}
+
+.complete_wrap {
+  height: 120px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 </style>

@@ -57,7 +57,15 @@
             value-format="yyyy-MM-dd HH:mm:ss"
             @change="handleChange(item.key, itemInfo[item.key])"
           >            
-            <template v-if="item.option">
+            <template v-if="item.option && item.key === 'infoSource'">
+              <el-option 
+                v-for="cur in computedList(item.option)"
+                :key="cur"
+                :label="cur"
+                :value="cur"
+              />
+            </template>
+            <template v-else-if="item.option">
               <el-option 
                 v-for="cur in computedList(item.option)"
                 :key="cur.id"
@@ -173,7 +181,7 @@ export default {
       switch (option) {
         case 'psList': return this.psList;
         case 'policeList': return this.policeList;
-        case 'infoSourceList': return this.infoSourceList
+        case 'infoSourceList': return this.infoSourceList.map(item => item.name)
         case 'employedList': return this.employedList
         default: return [];
       }
@@ -217,14 +225,14 @@ export default {
 
           const deptName = (this.psList.find(item => item.id === this.itemInfo.orgId) || {}).name
           const sysUserName = (this.policeList.find(item => item.id === this.itemInfo.sysUserId) || {}).name
-          const infoSource = (this.infoSourceList.find(item => item.id === this.itemInfo.infoSource) || {}).name
+          // const infoSource = (this.infoSourceList.find(item => item.id === this.itemInfo.infoSource) || {}).name
 
           this.createOrUpdateInfoSubmitAction({
             ...this.itemInfo,
             infoBody: this.editorData || "",
             deptName,
             sysUserName,
-            infoSource
+            // infoSource
           })
             .then(res => {
               this.$message.success(this.itemInfo.id ?'修改成功!' : '创建成功！')

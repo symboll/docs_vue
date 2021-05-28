@@ -150,6 +150,7 @@ export default {
         { label: '上报时间', key: 'time', value: '', type: 'el-date-picker', datePickerType: 'daterange', clearable: true },
         { label: '所属信息员', key: 'personNo', value: '', type: 'el-input', clearable: true },
         { label: '信息状态', key: 'status', value: '', type: 'el-select',option: "statusList",  clearable: true },
+        // { label: '是否录用', key: 's', value: '', type: 'el-select',option: "booleList",  clearable: true },
       ],
       searchObj: {},
       pagination: {
@@ -164,6 +165,7 @@ export default {
         { property: 'reportTime', label: '上报时间', width: '200'},
         { property: 'personNo', label: '所属信息员', width: ''},
         { property: 'status', label: '信息状态', width: ''},
+        // { property: 's', label: '是否录用', width: ''},
       ],
       auditVisible: false,
       auditInfo: "",

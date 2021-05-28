@@ -23,6 +23,19 @@
             <div>{{ item.label }}</div>
             <div> {{ showValueMap(item.key,itemInfo[item.key] )}}</div>
           </template>
+          <template v-else-if="item.custom2">
+            <div>{{ item.label }}</div>
+            <div class="upload_item">
+              <template v-for="i in itemInfo.attachmentList" >
+                <div v-if="/\.(jpg|png|gif|jpeg)$/.test(i)"  :key="i">
+                  <img :src='i' alt="">
+                </div>
+                <div v-else  :key="i">
+                  <video :src="i" controls></video>
+                </div>
+              </template>
+            </div>
+          </template>
           <template v-else>
             <div>{{ item.label }}</div>
             <div>{{ itemInfo[item.key] }}</div>
@@ -54,6 +67,8 @@ export default {
         { key: "status", label: "审核状态", type: "line" , custom: true},
         { key: "employed", label: "是否录用", type: "line" },
         { key: "remark", label: "审核意见", type: "line" },
+
+        { key: "attachmentList", label: "附件", type: 'line', custom2: true }
       ]
     }
   },
@@ -132,5 +147,24 @@ export default {
   @import './index.scss';
   .c_body {
     box-shadow: none !important;
+  }
+
+  .upload_item {
+    margin-right: 20px;
+    display: flex;
+    justify-content: flex-start;
+    > div {
+      width: 120px;
+      height: 120px;
+      margin-right: 20px;
+      > img {
+        width: 100%;
+        height: 100%;
+      }
+      > video {
+        width: 100%;
+        height: 100%;
+      }
+    }
   }
 </style>

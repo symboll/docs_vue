@@ -4,6 +4,8 @@ import {
   getDetailApi,
   getListApi,
   auditApi,
+  completeApi,
+  completeAuditApi,
   importApi
 } from '@/api/template'
 
@@ -79,6 +81,21 @@ const actions = {
         .catch(err => reject(err))
     })
   },
+  completeAuditPersonalAction ({commit}, data) {
+    return new Promise((resolve,reject)=> {
+      completeAuditApi(type, data)
+        .then(res => resolve(res))
+        .catch(err => reject(err))
+    })
+  },
+  completePersonalAction ({commit}, data) {
+    return new Promise((resolve,reject)=> {
+      completeApi(type, data)
+        .then(res => resolve(res))
+        .catch(err => reject(err))
+    })
+  },
+
   personalImportAction ({ commit}, data) {
     return new Promise((resolve, reject)=> {
       importApi(type, data)

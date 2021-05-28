@@ -7,10 +7,13 @@
         返回
       </div>
       <div class="c_header_btn_wrap">
-        <el-button 
-          v-if="itemInfo.status !== 'init'"
-          round type="primary" class="c_btn" @click="handleTaskDistribution" 
-        >任务下发</el-button>
+
+        <template v-if="buttonList('Record').includes('PersonTaskDown')">
+          <el-button 
+            v-if="itemInfo.status !== 'init'"
+            round type="primary" class="c_btn" @click="handleTaskDistribution" 
+          >任务下发</el-button>
+        </template>
 
         <!-- <c-button
           round iconType="ic_dayin"  @click="handlePrint"
@@ -82,7 +85,7 @@
             label="操作"
             width="200">
             <template slot-scope="scope">
-              <template v-if="scope.row.status === 'init'">
+              <template v-if="scope.row.status === 'init' && buttonList('Record').includes('audit')">
                 <el-button
                   @click.native.prevent="handleAudit(scope.row)"
                   type="text"
@@ -91,7 +94,8 @@
                 </el-button>
                 <span> | </span>
               </template>
-              <template v-if="scope.row.status === 'finish'">
+              <template v-if="(currentUser.userType === 3 && scope.row.status !== 'finish') 
+                          || (currentUser.userType === 1 && scope.row.status === 'finish')">
                 <el-button
                   @click.native.prevent="handleEvaluate(scope.row)"
                   type="text"
@@ -263,6 +267,7 @@
                     <img
                       :src="i" alt=""
                       class="img_style"
+                      @click="handleClick('image', i)"
                     >
                   </div>
                 </div>
@@ -271,6 +276,7 @@
                     <video 
                       :src="i"  
                       class="video_style"
+                      @click="handleClick('video', i)"
                     ></video>
                   </div>
                 </div>
@@ -280,11 +286,43 @@
         </div>
       </section>
     </c-t-dialog>
+
+    <c-t-dialog
+      :visible="viewVisible"
+      :title="viewType === 'video'? '查看视频': '查看图片'"
+      :width="viewType=== 'video'? '520px': '360px' "
+      @confirm="viewClose"
+      @close="viewClose"
+    >
+      <template v-if="viewType === 'video'">
+        <video class="big_video" :src="viewUrl" controls autoplay></video>
+      </template>
+      <template v-else>
+        <img class="big_image" :src="viewUrl" alt="">
+      </template>
+    </c-t-dialog>
+
+    <c-t-dialog
+      :visible="evaluateVisable"
+      title="评价"
+      @confirm="evaluateConfirm"
+      @close="evaluateClose"
+    >
+      <el-select v-model="evaluateValue" @change="evaluateChange">
+        <el-option 
+          v-for="item in evaluationList" 
+          :key="item.id"
+          :label="item.name"
+          :value="item.name"
+        >
+        </el-option>
+      </el-select>
+    </c-t-dialog>
   </div>
 </template>
 
 <script>
-import { mapState, mapActions, mapMutations } from 'vuex'
+import { mapState, mapActions, mapMutations, mapGetters } from 'vuex'
 import CUploadBtn from '@/components/c-upload-btn'
 export default {
   components: {
@@ -356,6 +394,15 @@ export default {
         { typeCode: "人员等级", key: "personLevelList"  },
       ],
       taskDownVisible: false,
+
+      viewVisible: false,
+      viewUrl:'',
+      viewType: '',
+
+
+      evaluateVisable: false,
+      evaluateId: '',
+      evaluateValue: ''
     }
   },
   mounted() {
@@ -382,7 +429,10 @@ export default {
       personTypeList: state => state.personTypeList,
       personLevelList: state => state.personLevelList,
       visitFrequencyList: state => state.visitFrequencyList,
-    })
+    }),
+    ...mapGetters([
+      'buttonList'
+    ])
   },
   methods: {
     ...mapActions([
@@ -396,7 +446,8 @@ export default {
       'getDicItemsAction',
       'taskDownAction',
       'getPoliceStationListAction',
-      'getPoliceListAction'
+      'getPoliceListAction',
+      'evaluationAction'
     ]),
     ...mapMutations([
       'RECORD_ITEM_UPDATE',
@@ -454,13 +505,15 @@ export default {
         query: { id }
       })
     },
-    // computedFormat(url) {
-    //   const imgPattern =  /\.(jpg|png|gif|jpeg)$/;
-    //   const videoPattern = /\.(mp4|avi|wmv|mov|mpeg|mpg|rm|ram|swf|flv)$/;
-
-    //   if(imgPattern.test(url)) return 'img'
-    //   else if(videoPattern.test(url)) return 'video'
-    // },
+    viewClose () {
+      this.viewType = ''
+      this.viewVisible = false
+    },
+    handleClick (type, url) {
+      this.viewType = type
+      this.viewVisible = true
+      this.viewUrl = url
+    },
     deleteItem (index, type) {
       this.RECORD_ITEM_UPDATE({index, type})
     },
@@ -598,9 +651,34 @@ export default {
         .catch(err => this.$message.error(err))
     },
     handleEvaluate (row) {
-
+      this.evaluateId = row.id
+      this.evaluateVisable = true
     },
-
+    evaluateChange (event) {
+      this.evaluateValue = event
+    },
+    evaluateConfirm () {
+      if(this.evaluateValue === '') {
+        this.$message.error('请选择评价')
+        return
+      }else {
+        const params = {
+          evaluation: this.evaluateValue,
+          id: this.evaluateId,
+          type: "person"
+        }
+        this.evaluationAction(params)
+          .then(res => {
+            this.evaluateClose()
+            this.searchFn()
+          })
+          .catch(err => this.$message.error(err))
+      }
+    },
+    evaluateClose () {
+      this.evaluateId = ''
+      this.evaluateVisable = false
+    },
     handleDetail (row) {
       this.getRecordDetailAction({ id: row.id, type: "person"})
         .then(_ =>  this.infoVisible = true )
@@ -684,4 +762,13 @@ export default {
       }
     }
   }
+
+.big_image {
+  width: 320px;
+  height: 320px;
+}
+.big_video {
+  width: 480px;
+  height: 320px;
+}
 </style>

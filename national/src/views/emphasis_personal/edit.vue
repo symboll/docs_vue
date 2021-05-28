@@ -165,13 +165,12 @@ export default {
         if (valid) {
           const deptName = (this.psList.find(item => item.id === this.itemInfo.orgId) || {}).name
           const sysUserName = (this.policeList.find(item => item.id === this.itemInfo.sysUserId) || {}).name
-          const organizationType = (this.organTypeList.find(item => item.id === this.itemInfo.organizationType)|| {}).name
 
+          console.log('organTypeList',this.organTypeList)
           this.createOrUpdatePersonalAction({
             ...this.itemInfo,
             deptName,
             sysUserName,
-            organizationType
           })
             .then(res => {
               this.$message.success(this.itemInfo.id ?'修改成功!' : '创建成功！')

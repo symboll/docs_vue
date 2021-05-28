@@ -8,7 +8,8 @@ import {
 } from '@/api/template'
 
 import {
-  getDetailApi
+  getDetailApi,
+  evaluationApi
 } from '../../api/record.js'
 
 const type = 'record'
@@ -86,6 +87,15 @@ const actions = {
         .catch(err => reject(err))
     })
   },
+
+  evaluationAction ({ commit }, data) {
+    return new Promise((resolve, reject)=> {
+      evaluationApi(data)
+        .then(res => resolve(res))
+        .catch(err => reject(err))
+
+    })
+  }
 }
 const getters = {}
 
