@@ -1,176 +1,179 @@
-<template>
-  <el-scrollbar wrap-class="scrollbar-wrapper">
-    <div class="c_wrap">
-      <header class="c_header">
-        <div @click="handleBack" class="back">
-          <i class="el-icon-arrow-left"></i>
-          返回
-        </div>
-        <el-button type="primary" class="c_btn" round @click="handleEdit">
-          编辑
-        </el-button>
-      </header>
-      <section class="c_body">
-        <div class="c_header_item_info">
-          <div v-for="item in showInfoList" :key="item.key" :class="{
-            'title': item.type === 'title',
-            'line': item.type === 'line'
-          }">
-            <template v-if="item.type ==='title'">
-              <div>{{ item.label }}</div>
-            </template>
-
-            <template v-else-if="item.type === 'line'">
-              <div>{{ item.label }}</div>
-              <div v-if="item.key === 'status' || (item.key === 'cancelStatus' && itemInfo['reportFlag'])">
-                {{ showValueMap(itemInfo[item.key], itemInfo["reportFlag"]) }} 
-                <span v-if="itemInfo[item.key] === 'fail'" class="c_primary" @click="handleApply(item.key)" >重新申请>>></span>
-              </div>  
-              <div v-else>{{ itemInfo[item.key] }}</div>
-            </template>
-            <template v-else>
-              <div>{{ item.label }}</div>
-              <div>{{ itemInfo[item.key] }}</div>
-            </template>
+<template> 
+  <div>
+    <el-scrollbar wrap-class="scrollbar-wrapper">
+      <div class="c_wrap">
+        <header class="c_header">
+          <div @click="handleBack" class="back">
+            <i class="el-icon-arrow-left"></i>
+            返回
           </div>
-        </div>
-
-        <c-table-pagin 
-          tableTitle="信息员接待联络情况"
-          :list="receptionList"
-          :total="receptionListTotal"
-          :tableHeader="tableHeader1"
-          @create="handleCreate1"
-          @search="handleSearch1"
-          @detail="handleDetail1"
-          @edit="handleEdit1"
-          @remove="handleRemove1"
-        />
-        <c-table-pagin 
-          tableTitle="信息员考核情况"
-          :list="assessList"
-          :total="assessListTotal"
-          :tableHeader="tableHeader2"
-          @create="handleCreate2"
-           @search="handleSearch2"
-          @detail="handleDetail2"
-          @edit="handleEdit2"
-          @remove="handleRemove2"
-        />
-      </section>
-      <c-t-dialog
-        :visible="visible"
-        :title="title"
-        confirmButtonText='保 存'
-        width="680px"
-        :showConfirm="showConfirm1"
-        @confirm="handleConfirm1"
-        @close="handleClose1"
-      >
-        <el-form label-width="120px" :model="receptionItem" ref="form1" :rules="rules1">
-          <el-form-item 
-            v-for="item in createOrEditForm1"
-            :key="item.key"
-            :label="item.label"
-            :prop="item.key"
-            :class="{
-              'c_disabled': !showConfirm1
-            }"
-          >
-            <component 
-              :is="item.type" 
-              v-model="receptionItem[item.key]" 
-              :type="item.childType ? item.childType : 'text'"
-              format="yyyy-MM-dd HH:mm:ss"
-              value-format="yyyy-MM-dd HH:mm:ss"
-              :disabled="!showConfirm1"
-            >
-              <template v-if="item.type === 'el-select'">
-                <template v-if="item.key === 'sysUserId'">
-                  <el-option v-for="item in computedOption(item.option)"
-                    :key="item.id"
-                    :value="item.id"
-                    :label="item.name"
-                  ></el-option>
-                </template>
-                <template v-else>
-                  <el-option v-for="item in computedOption(item.option)"
-                    :key="item.id"
-                    :value="item.name"
-                    :label="item.name"
-                  ></el-option>
-                </template>
+          <el-button type="primary" class="c_btn" round @click="handleEdit">
+            编辑
+          </el-button>
+        </header>
+        <section class="c_body">
+          <div class="c_header_item_info">
+            <div v-for="item in showInfoList" :key="item.key" :class="{
+              'title': item.type === 'title',
+              'line': item.type === 'line'
+            }">
+              <template v-if="item.type ==='title'">
+                <div>{{ item.label }}</div>
               </template>
 
-            </component> 
-          </el-form-item>
-        </el-form>
-      </c-t-dialog>
-
-      <c-c-dialog
-        :visible="removeVisible1"
-        @confirm="removeConfirm1"
-        @close="removeClose1"
-      ></c-c-dialog> 
-
-
-
-      <c-t-dialog
-        :visible="visible2"
-        :title="title2"
-        confirmButtonText='保 存'
-        width="680px"
-        :showConfirm="showConfirm2"
-        @confirm="handleConfirm2"
-        @close="handleClose2"
-      >
-        <el-form label-width="120px" :model="assessItem" ref="form2" :rules="rules2">
-          <el-form-item 
-            v-for="item in createOrEditForm2"
-            :key="item.key"
-            :label="item.label"
-            :prop="item.key"
-            :class="{
-              'c_disabled': !showConfirm2
-            }"
-          >
-            <component 
-              :is="item.type" 
-              v-model="assessItem[item.key]" 
-              :type="item.childType ? item.childType : 'text'"
-              format="yyyy-MM-dd HH:mm:ss"
-              value-format="yyyy-MM-dd HH:mm:ss"
-              :disabled="!showConfirm2"
-            >
-              <template v-if="item.type === 'el-select'">
-                <template v-if="item.key === 'sysUserId'">
-                  <el-option v-for="item in computedOption(item.option)"
-                    :key="item.id"
-                    :value="item.id"
-                    :label="item.name"
-                  ></el-option>
-                </template>
-                <template v-else>
-                  <el-option v-for="item in computedOption(item.option)"
-                    :key="item.id"
-                    :value="item.name"
-                    :label="item.name"
-                  ></el-option>
-                </template>
+              <template v-else-if="item.type === 'line'">
+                <div>{{ item.label }}</div>
+                <div v-if="item.key === 'status' || (item.key === 'cancelStatus' && itemInfo['reportFlag'])">
+                  {{ showValueMap(itemInfo[item.key], itemInfo["reportFlag"]) }} 
+                  <span v-if="itemInfo[item.key] === 'fail'" class="c_primary" @click="handleApply(item.key)" >重新申请>>></span>
+                </div>  
+                <div v-else>{{ itemInfo[item.key] }}</div>
               </template>
+              <template v-else>
+                <div>{{ item.label }}</div>
+                <div>{{ itemInfo[item.key] }}</div>
+              </template>
+            </div>
+          </div>
 
-            </component> 
-          </el-form-item>
-        </el-form>
-      </c-t-dialog>
+          <c-table-pagin 
+            tableTitle="信息员接待联络情况"
+            :list="receptionList"
+            :total="receptionListTotal"
+            :tableHeader="tableHeader1"
+            @create="handleCreate1"
+            @search="handleSearch1"
+            @detail="handleDetail1"
+            @edit="handleEdit1"
+            @remove="handleRemove1"
+          />
+          <c-table-pagin 
+            tableTitle="信息员考核情况"
+            :list="assessList"
+            :total="assessListTotal"
+            :tableHeader="tableHeader2"
+            @create="handleCreate2"
+            @search="handleSearch2"
+            @detail="handleDetail2"
+            @edit="handleEdit2"
+            @remove="handleRemove2"
+          />
+        </section>
+      </div>
+    </el-scrollbar>
 
-      <c-c-dialog
-        :visible="removeVisible2"
-        @confirm="removeConfirm2"
-        @close="removeClose2"
-      ></c-c-dialog> 
-    </div>
-  </el-scrollbar>
+    <c-t-dialog
+      :visible="visible"
+      :title="title"
+      confirmButtonText='保 存'
+      width="680px"
+      :showConfirm="showConfirm1"
+      @confirm="handleConfirm1"
+      @close="handleClose1"
+    >
+      <el-form label-width="120px" :model="receptionItem" ref="form1" :rules="rules1">
+        <el-form-item 
+          v-for="item in createOrEditForm1"
+          :key="item.key"
+          :label="item.label"
+          :prop="item.key"
+          :class="{
+            'c_disabled': !showConfirm1
+          }"
+        >
+          <component 
+            :is="item.type" 
+            v-model="receptionItem[item.key]" 
+            :type="item.childType ? item.childType : 'text'"
+            format="yyyy-MM-dd HH:mm:ss"
+            value-format="yyyy-MM-dd HH:mm:ss"
+            :disabled="!showConfirm1"
+          >
+            <template v-if="item.type === 'el-select'">
+              <template v-if="item.key === 'sysUserId'">
+                <el-option v-for="item in computedOption(item.option)"
+                  :key="item.id"
+                  :value="item.id"
+                  :label="item.name"
+                ></el-option>
+              </template>
+              <template v-else>
+                <el-option v-for="item in computedOption(item.option)"
+                  :key="item.id"
+                  :value="item.name"
+                  :label="item.name"
+                ></el-option>
+              </template>
+            </template>
+
+          </component> 
+        </el-form-item>
+      </el-form>
+    </c-t-dialog>
+
+    <c-c-dialog
+      :visible="removeVisible1"
+      @confirm="removeConfirm1"
+      @close="removeClose1"
+    ></c-c-dialog> 
+
+
+
+    <c-t-dialog
+      :visible="visible2"
+      :title="title2"
+      confirmButtonText='保 存'
+      width="680px"
+      :showConfirm="showConfirm2"
+      @confirm="handleConfirm2"
+      @close="handleClose2"
+    >
+      <el-form label-width="120px" :model="assessItem" ref="form2" :rules="rules2">
+        <el-form-item
+          v-for="item in createOrEditForm2"
+          :key="item.key"
+          :label="item.label"
+          :prop="item.key"
+          :class="{
+            'c_disabled': !showConfirm2
+          }"
+        >
+          <component
+            :is="item.type"
+            v-model="assessItem[item.key]" 
+            :type="item.childType ? item.childType : 'text'"
+            format="yyyy-MM-dd HH:mm:ss"
+            value-format="yyyy-MM-dd HH:mm:ss"
+            :disabled="!showConfirm2"
+          >
+            <template v-if="item.type === 'el-select'">
+              <template v-if="item.key === 'sysUserId'">
+                <el-option v-for="item in computedOption(item.option)"
+                  :key="item.id"
+                  :value="item.id"
+                  :label="item.name"
+                ></el-option>
+              </template>
+              <template v-else>
+                <el-option v-for="item in computedOption(item.option)"
+                  :key="item.id"
+                  :value="item.name"
+                  :label="item.name"
+                ></el-option>
+              </template>
+            </template>
+
+          </component> 
+        </el-form-item>
+      </el-form>
+    </c-t-dialog>
+
+    <c-c-dialog
+      :visible="removeVisible2"
+      @confirm="removeConfirm2"
+      @close="removeClose2"
+    ></c-c-dialog> 
+  </div>
 </template>
 
 <script>
@@ -555,7 +558,7 @@ export default {
 </script>
 <style lang="scss" scoped>
   @import './index.scss';
-  ::v-deep .scrollbar-wrapper.el-scrollbar__wrap.el-scrollbar__wrap--hidden-default{
+  ::v-deep .scrollbar-wrapper.el-scrollbar__wrap{
     height: calc(100vh - 48px);
   }   
   ::v-deep .el-input.is-disabled .el-input__inner,
