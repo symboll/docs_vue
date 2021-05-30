@@ -22,7 +22,8 @@
               item.key === 'orgId' || 
               item.key === 'sysUserId' ||
               item.key === 'deptName' ||
-              item.key === 'owner'
+              item.key === 'owner' ||
+              item.key === 'employed'
             )">
               <el-option 
                 v-for="cur in computedList(item.option)"
@@ -92,6 +93,10 @@ export default {
     taskTypeList: {
       type: Array,
       default: () => []
+    },
+    employedList: {
+      type: Array,
+      default: () => []
     }
   },
   methods: {
@@ -105,6 +110,7 @@ export default {
         case 'useDirList': return this.useDirList;
         case 'statusList': return this.statusList;
         case "taskTypeList": return this.taskTypeList;
+        case "employedList": return this.employedList;
         default: return [];
       }
     },

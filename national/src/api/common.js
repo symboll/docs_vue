@@ -51,3 +51,10 @@ export const exportApi = (params) => {
     params
   })
 }
+
+
+export const allInfoPersonApi = () => {
+  return axios.request({
+    url: `/common/allInfoPerson`,
+  })
+}

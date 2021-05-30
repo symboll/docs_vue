@@ -1,13 +1,13 @@
 <template>
   <div class="c_wrap">
     <!-- buttonList('TodoList') -->
-    <header class="c_header"><span>代办事项列表</span></header>
+    <header class="c_header"><span>待办事项列表</span></header>
     <section class="c_body">
       <el-table
         class="c_table"
         :data="list"
         highlight-current-row
-        max-height="610"
+        height="610"
         style="width: 100%"
       >
         <el-table-column type="index" label="序号" wdith="100"></el-table-column>
@@ -65,7 +65,7 @@
 
     <el-card v-if="show" class="el_todoList">
       <div slot="header" class="clearfix">
-        <span>代办事项提醒</span>
+        <span>待办事项提醒</span>
         <i class="el-icon-close" style="float: right; padding: 3px 0" @click="handleClose" ></i>
       </div>
       <div class="body">

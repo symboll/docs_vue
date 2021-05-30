@@ -26,7 +26,7 @@
         class="c_table"
         :data="list"
         highlight-current-row
-        max-height="710"
+        height="710"
         style="width: 100%"
       >
         <el-table-column type="index" label="序号" wdith="100"></el-table-column>
@@ -62,7 +62,7 @@
           label="操作"
           width="200">
           <template slot-scope="scope">
-            <template v-if="buttonList('EmphasisPersonal').includes('tf')">
+            <template v-if="buttonList('EmphasisPersonal').includes('tf') && scope.row.status === 'finish'">
               <el-button
                 @click.native.prevent="handleComplete(scope.row)"
                 type="text"
@@ -71,7 +71,7 @@
               </el-button>
               <span> | </span>
             </template>
-            <template v-if="buttonList('EmphasisPersonal').includes('tfAudit')">
+            <template v-if="buttonList('EmphasisPersonal').includes('tfAudit') && scope.row.showAuditTf">
               <el-button
                 @click.native.prevent="handleCompleteAudit(scope.row)"
                 type="text"
@@ -80,7 +80,7 @@
               </el-button>
               <span> | </span>
             </template>
-            <template v-if="scope.row.status === 'init' && buttonList('EmphasisPersonal').includes('audit')">
+            <template v-if="scope.row.status === 'init' && buttonList('EmphasisPersonal').includes('audit') && scope.row.showAudit">
               <el-button
                 @click.native.prevent="handleAudit(scope.row)"
                 type="text"

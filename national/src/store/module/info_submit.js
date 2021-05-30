@@ -6,6 +6,10 @@ import {
   auditApi,
   importApi
 } from '@/api/template'
+
+import {
+  allInfoPersonApi
+}from '@/api/common'
 const type = 'info/submit'
 
 const state = {
@@ -13,7 +17,8 @@ const state = {
   infoSubmitTotal: 0,
   infoSubmitItem: {
     attachmentList:[]
-  }
+  },
+  allInfoPerson: []
 }
 const mutations = {
   SET_INFO_SUBMIT_ITEM_ATTCH (state, file) {
@@ -74,7 +79,16 @@ const actions = {
         .catch(err => reject(err))
     })
   },
-
+  allInfoPersonAction({ commit}) {
+    return new Promise((resolve, reject) => {
+      allInfoPersonApi()
+        .then(res => {
+          commit('SET', { module:"infoSubmit", key: "allInfoPerson", value: res.data })
+          resolve(res)
+        })
+        .catch(err => reject(err))
+    })
+  }
 }
 const getters = {}
 

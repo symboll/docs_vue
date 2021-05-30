@@ -23,13 +23,14 @@
         :psList="psList"
         :policeList="policeList"
         :statusList="statusList"
+        :employedList="employedList"
         @policeStationChange="handleChangepoliceStation"
       />
       <el-table
         class="c_table"
         :data="list"
         highlight-current-row
-        max-height="610"
+        height="610"
         style="width: 100%"
       >
         <el-table-column type="index" label="序号" wdith="100"></el-table-column>
@@ -47,6 +48,9 @@
                     'c_grey': scope.row.status === 'fail',
                   }">{{ computedStatus(scope.row.status) }}</span>
               </template>
+              <template v-else-if="item.property==='employed'">
+                {{ scope.row.employed ? '录用':'不录用' }}
+              </template>
               <template v-else >
                 <span>{{ scope.row[item.property] }}</span>
               </template>
@@ -58,7 +62,7 @@
           label="操作"
           width="200">
           <template slot-scope="scope">
-            <template v-if="buttonList('InfoSubmit').includes('audit') && scope.row.status=== 'init'">
+            <template v-if="buttonList('InfoSubmit').includes('audit') && scope.row.status === 'init'">
               <el-button
                 @click.native.prevent="handleAudit(scope.row)"
                 type="text"
@@ -121,6 +125,15 @@
           placeholder="请输入"
           :autosize="{ minRows: 4, maxRows: 8}"
         ></el-input>
+        <div class="select_wrap" v-if="currentUser.userType == 3">
+          <div class="title">是否录用</div>
+          <el-select v-model="isHire">
+            <el-option 
+              v-for="item in employedList" 
+              :key="item.id" :value='item.id' :label='item.name'></el-option>
+          </el-select>
+        </div>
+
         <div class="notes">注：若拒绝审批通过，需输入审核意见</div>
       </section>
       <span slot="footer" class="dialog-footer">
@@ -150,7 +163,7 @@ export default {
         { label: '上报时间', key: 'time', value: '', type: 'el-date-picker', datePickerType: 'daterange', clearable: true },
         { label: '所属信息员', key: 'personNo', value: '', type: 'el-input', clearable: true },
         { label: '信息状态', key: 'status', value: '', type: 'el-select',option: "statusList",  clearable: true },
-        // { label: '是否录用', key: 's', value: '', type: 'el-select',option: "booleList",  clearable: true },
+        { label: '是否录用', key: 'employed', value: '', type: 'el-select', option: "employedList",  clearable: true },
       ],
       searchObj: {},
       pagination: {
@@ -165,7 +178,7 @@ export default {
         { property: 'reportTime', label: '上报时间', width: '200'},
         { property: 'personNo', label: '所属信息员', width: ''},
         { property: 'status', label: '信息状态', width: ''},
-        // { property: 's', label: '是否录用', width: ''},
+        { property: 'employed', label: '是否录用', width: ''},
       ],
       auditVisible: false,
       auditInfo: "",
@@ -174,6 +187,7 @@ export default {
       removeId: 0,
 
       visible: false,
+      isHire:''
     }
   },
   computed: {
@@ -184,7 +198,9 @@ export default {
       psList: state => state.policeStationList,
       policeList: state => state.policeList,
       useDirList: state => state.useDirectionList,
-      statusList: state => state.infoSubmitstatusList
+      statusList: state => state.infoSubmitstatusList,
+      employedList: state => state.employedList,
+      currentUser: state => state.user.currentUser
     }),
     ...mapGetters([
       'buttonList'
@@ -204,7 +220,7 @@ export default {
       "infoSubmitImportAction",
       "getInfoSubmitDetailAction",
       "getInfoSubmitListAction",
-      "auditInfoSubmitAction"
+      "auditInfoSubmitAction",
     ]),
     ...mapMutations([
       'SET'
@@ -269,6 +285,9 @@ export default {
         isPass: true,
         type: 'info_person'
       }
+      if(this.currentUser.userType === 3) {
+        param.isHire = this.isHire
+      }
       this.auditInfoSubmitAction(param)
         .then(_ => {
           this.auditInfo = ''
@@ -288,6 +307,9 @@ export default {
         id: this.auditId,
         isPass: false,
         type: 'info_person'
+      }
+      if(this.currentUser.userType === 3) {
+        param.isHire = this.isHire
       }
       this.auditInfoSubmitAction(param)
         .then(_ => {
@@ -327,6 +349,7 @@ export default {
       this.searchObj = {...otherOptions}
       this.pagination = { pageNo: 1, pageSize: 10 }
       this.searchFn()
+      // console.log('searchObj==>', searchObj)
     },
     handleSizeChange(val) {
       this.pagination.pageSize = val
@@ -372,6 +395,18 @@ export default {
   }
   .notes {
     margin-top: 10px;
+  }
+}
+
+.select_wrap {
+  display: flex;
+  height: 60px;
+  justify-content: flex-start;
+  align-items: center;
+  > div {
+    height: 100%;
+    line-height: 60px;
+    margin-top: 20px;
   }
 }
 </style>

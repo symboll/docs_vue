@@ -6,7 +6,7 @@
         class="c_table"
         :data="list"
         highlight-current-row
-        max-height="610"
+        height="610"
         style="width: 100%"
       >
         <el-table-column type="index" label="序号" wdith="100"></el-table-column>

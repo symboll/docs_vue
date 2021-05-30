@@ -57,7 +57,8 @@
             value-format="yyyy-MM-dd HH:mm:ss"
             @change="handleChange(item.key, itemInfo[item.key])"
           >            
-            <template v-if="item.option && item.key === 'infoSource'">
+            <template v-if="(item.option && item.key === 'infoSource') 
+                  || (item.option && item.key === 'personNo')">
               <el-option 
                 v-for="cur in computedList(item.option)"
                 :key="cur"
@@ -83,6 +84,7 @@
 <script>
 import { mapState,mapActions, mapMutations } from 'vuex'
 import wangEditor from 'wangeditor'
+import { constants } from 'fs';
 export default {
   data () {
     return {
@@ -91,8 +93,8 @@ export default {
       createOrEditForm: [
         { key: 'title1', type: "div" , className: "title", context: "基础信息:" },
         { label: '信息来源', key: 'infoSource', type: 'el-select', option: 'infoSourceList'},
-        { label: '信息员编号', key: 'personNo', type: 'el-input' , inithide: true},
-        { label: '情报编号', key: 'infoNo', type: 'el-input' },
+        { label: '信息员编号', key: 'personNo', type: 'el-select', option: 'allInfoPerson', inithide: true},
+        // { label: '情报编号', key: 'infoNo', type: 'el-input' },
         { label: '是否录用', key: 'employed', type: 'el-select', option: "employedList" },
         // { label: '上报人', key: 'sysUserId',  type: 'el-select', option: "policeList", },
         // { label: '上报时间', key: 'reportTime', type: 'el-date-picker', datePickerType: 'date' },
@@ -104,7 +106,7 @@ export default {
       ],
       rules: {
         infoSource: [{ required: true, message: '请选择信息来源', trigger: 'blur' },],
-        personNo: [{ required: true, message: '请输入信息员编号', trigger: 'blur' },],
+        personNo: [{ required: true, message: '请选择信息员编号', trigger: 'blur' },],
         infoNo: [{ required: true, message: '请输入情报编号', trigger: 'blur' },],
         sysUserId: [{ required: true, message: '请选择上报人', trigger: 'blur' },],
         reportTime: [{ required: true, message: '请选择上报时间', trigger: 'blur' },],
@@ -119,7 +121,9 @@ export default {
       psList: state => state.policeStationList,
       policeList: state => state.policeList,
       infoSourceList: state => state.infoSourceList,
-      employedList: state => state.employedList
+      employedList: state => state.employedList,
+      currentUser: state=> state.user.currentUser,
+      allInfoPerson: state => state.infoSubmit.allInfoPerson
     }),
   },
   mounted() {
@@ -139,7 +143,8 @@ export default {
       'getInfoSubmitDetailAction',
 
       'commonUploadAction',
-      'getDicItemsAction'
+      'getDicItemsAction',
+      'allInfoPersonAction'
     ]),
     ...mapMutations([
       'SET_INFO_SUBMIT_ITEM_ATTCH'
@@ -155,6 +160,11 @@ export default {
       this.editor = editor
     },
     init () {
+      this.allInfoPersonAction()
+      console.log('currentUser==>',this.currentUser.userType)
+      if(this.currentUser.userType !== 1)  {
+        this.createOrEditForm.splice(3,1)
+      }
       const { id } = this.$route.query
       if(id) {
         this.getInfoSubmitDetailAction(id)
@@ -163,7 +173,9 @@ export default {
               this.createOrEditForm.splice(2,1,{ 
                 label: '信息员编号', 
                 key: 'personNo', 
-                type: 'el-input'})
+                type: 'el-select',
+                option: 'allInfoPerson'
+              })
             }
             this.editor.txt.html(this.itemInfo.infoBody) 
           })
@@ -183,6 +195,7 @@ export default {
         case 'policeList': return this.policeList;
         case 'infoSourceList': return this.infoSourceList.map(item => item.name)
         case 'employedList': return this.employedList
+        case 'allInfoPerson': return this.allInfoPerson.map(item => item.name)
         default: return [];
       }
     },
@@ -205,14 +218,13 @@ export default {
       }
 
       if(key === 'infoSource' && id !== '') {
-        const name = (this.infoSourceList.find(item => item.id === id) || {}).name
-        console.log(name)
-        if(name === '情报员上报'){
+        // const name = (this.infoSourceList.find(item => item.id === id) || {}).name
+        if(id === '情报员上报'){
           this.createOrEditForm.splice(2,1, 
-            { label: '信息员编号', key: 'personNo', type: 'el-input'})
-        } else if (name === '非情报员上报') {
+            { label: '信息员编号', key: 'personNo', type: 'el-select', option: 'allInfoPerson'})
+        } else if (id === '非情报员上报') {
           this.createOrEditForm.splice(2,1, 
-            { label: '信息员编号', key: 'personNo', type: 'el-input' , inithide: true})
+            { label: '信息员编号', key: 'personNo', type: 'el-select' ,option: 'allInfoPerson', inithide: true})
         }
       }
     },
@@ -222,18 +234,19 @@ export default {
     handleSubmit () {
       this.$refs['infoSubmitForm'].validate((valid) => {
         if (valid) {
-
           const deptName = (this.psList.find(item => item.id === this.itemInfo.orgId) || {}).name
           const sysUserName = (this.policeList.find(item => item.id === this.itemInfo.sysUserId) || {}).name
           // const infoSource = (this.infoSourceList.find(item => item.id === this.itemInfo.infoSource) || {}).name
-
-          this.createOrUpdateInfoSubmitAction({
-            ...this.itemInfo,
+          const item = {
+           ...this.itemInfo,
             infoBody: this.editorData || "",
             deptName,
             sysUserName,
-            // infoSource
-          })
+          }
+          if(!this.itemInfo.id) {
+            item.infoNo = Date.now().toString().slice(3)
+          }
+          this.createOrUpdateInfoSubmitAction(item)
             .then(res => {
               this.$message.success(this.itemInfo.id ?'修改成功!' : '创建成功！')
               this.$router.go(-1)

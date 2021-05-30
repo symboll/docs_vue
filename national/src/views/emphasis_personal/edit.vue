@@ -32,7 +32,15 @@
             v-model="itemInfo[item.key]" 
             @change="handleChange(item.key, itemInfo[item.key])"
           >            
-            <template v-if="item.option">
+            <template v-if="item.option && item.key === 'organizationType'">
+              <el-option 
+                v-for="cur in computedList(item.option)"
+                :key="cur"
+                :label="cur"
+                :value="cur"
+              />
+            </template>
+            <template v-else-if="item.option">
               <el-option 
                 v-for="cur in computedList(item.option)"
                 :key="cur.id"
@@ -48,7 +56,7 @@
 </template>
 
 <script>
-import { mapState,mapActions } from 'vuex'
+import { mapState,mapActions,mapMutations } from 'vuex'
 import { constants } from 'fs';
 export default {
   data () {
@@ -87,7 +95,7 @@ export default {
         { typeCode: "走访频率", key: "visitFrequencyList"  },
         { typeCode: "地域", key: "zoneList"  },
         { typeCode: "组织类别", key: "organTypeList"  },
-        { typeCode: "人员类别", key: "personTypeList"  },
+        // { typeCode: "人员类别", key: "personTypeList"  },
         { typeCode: "人员等级", key: "personLevelList"  },
       ]
     }
@@ -118,10 +126,15 @@ export default {
       'getPoliceStationListAction',
       'getDicItemsAction'
     ]),
+    ...mapMutations(['SET']),
     init () {
       const { id } = this.$route.query
       if(id) {
         this.getPersonalDetailAction(id)
+          .then(res => {
+            this.getDicItemsAction({ typeCode: res.organizationType, key: "personTypeList"  })
+              .catch(err => console.log(err))
+          })
           .catch(err => console.log(err))
       }
 
@@ -130,9 +143,6 @@ export default {
           .catch(err => console.log(err))
       }
     
-
-      // this.getDicItemsAction({ typeCode: "走访频率", key: "visitFrequencyList"  })
-      //   .catch(err => console.log(err))
       this.list.forEach(item => {
         this.getDicItemsAction(item)
           .catch(err => console.log(err))
@@ -144,7 +154,7 @@ export default {
         case 'policeList': return this.policeList;
         case 'visitFrequencyList': return this.visitFrequencyList;
         case 'zoneList': return this.zoneList;
-        case 'organTypeList': return this.organTypeList;
+        case 'organTypeList': return this.organTypeList.map(item => item.name);
         case 'personTypeList': return this.personTypeList;
         case 'personLevelList': return this.personLevelList;
 
@@ -155,7 +165,16 @@ export default {
       if (key === 'orgId' && value !== '') {
         this.getPoliceListAction(value)
           .catch(err => console.log(err))
+      }else if(key === 'organizationType' && value!== '') {
+        this.getDicItemsAction({ typeCode: value, key: "personTypeList"  })
+          .catch(err => console.log(err))
+        this.SET({ module: "personal", key: "personalItem", value: {
+          ...this.itemInfo,
+          personnelType: ''
+        }})
+        // state.personal.personalItem
       }
+      
     },
     handleBack () {
       this.$router.go(-1)
@@ -166,7 +185,6 @@ export default {
           const deptName = (this.psList.find(item => item.id === this.itemInfo.orgId) || {}).name
           const sysUserName = (this.policeList.find(item => item.id === this.itemInfo.sysUserId) || {}).name
 
-          console.log('organTypeList',this.organTypeList)
           this.createOrUpdatePersonalAction({
             ...this.itemInfo,
             deptName,

@@ -65,7 +65,7 @@ export default {
 
         { key: "title3", label: "审核信息", type: "title" },
         { key: "status", label: "审核状态", type: "line" , custom: true},
-        { key: "employed", label: "是否录用", type: "line" },
+        { key: "employed", label: "是否录用", type: "line" , custom: true},
         { key: "remark", label: "审核意见", type: "line" },
 
         { key: "attachmentList", label: "附件", type: 'line', custom2: true }
@@ -77,7 +77,8 @@ export default {
       itemInfo: state => state.infoSubmit.infoSubmitItem,
       psList: state => state.policeStationList,
       policeList: state => state.policeList,
-      statusList: state => state.infoSubmitstatusList
+      statusList: state => state.infoSubmitstatusList,
+      employedList: state => state.employedList
     })
   },
   mounted() {
@@ -109,6 +110,9 @@ export default {
             break;
           case 'sysUserId':
             arr = this.policeList
+            break;
+          case  'employed':
+            arr = this.employedList
             break;
           default:
             arr = []

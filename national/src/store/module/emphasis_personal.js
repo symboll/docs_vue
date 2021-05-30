@@ -22,8 +22,8 @@ const state = {
     // finish: '完成',
     // fail: '办结'
     init:'审核中',
-    finish:'完成',
-    fail:'审核失败',
+    finish:'通过',
+    fail:'拒绝',
     close: '办结中',
     close_finish:'办结审核成功',
     close_fail: '办结审核失败'

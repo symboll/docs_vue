@@ -25,7 +25,8 @@ const state = {
   statusMap: {
     init: '待审核',
     finish: '审核通过',
-    fail: '拒绝'
+    fail: '拒绝',
+    evaluation: '已评价'
   },
 }
 

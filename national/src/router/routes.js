@@ -12,13 +12,13 @@ export default [
         name: 'TodoList',
         // component: () => import(/* webpackChunkName: "todolist" */ '../views/todo_list/index.vue'),
         component: ViewWrap,
-        meta: { title: "代办事项", icon: require('../assets/icons/dhl_dbsx@3x.png') },
+        meta: { title: "待办事项", icon: require('../assets/icons/dhl_dbsx@3x.png') },
         children: [
           {
             path: 'home',
             name: 'Home',
             component: () => import(/* webpackChunkName: "todolist" */ '../views/todo_list/index.vue'),
-            meta: { title: "代办事项" }
+            meta: { title: "待办事项" }
           },
           {
             path: 'daily',
@@ -33,6 +33,24 @@ export default [
             meta: { title: "临时调度" }
           }
         ]
+      },
+      {
+        path: '/emphasisPersonal',
+        name: 'EmphasisPersonal',
+        component: () => import(/* webpackChunkName: "emphasis_personal" */ '../views/emphasis_personal/index.vue'),
+        meta: { title: "重点人员", icon: require('../assets/icons/dhl_zdry@3x.png') }
+      },
+      {
+        path: '/emphasisPersonalEdit',
+        name: 'EmphasisPersonalEdit',
+        component: () => import(/* webpackChunkName: "emphasis_personal_edit" */ '../views/emphasis_personal/edit.vue'),
+        meta: { title: "重点人员", hide: true }
+      },
+      {
+        path: '/emphasisPersonalInfo',
+        name: 'EmphasisPersonalInfo',
+        component: () => import(/* webpackChunkName: "emphasis_personal_info" */ '../views/emphasis_personal/info.vue'),
+        meta: { title: "重点人员", hide: true}
       },
       {
         path: '/person',
@@ -102,24 +120,7 @@ export default [
           },
         ]
       },
-      {
-        path: '/emphasisPersonal',
-        name: 'EmphasisPersonal',
-        component: () => import(/* webpackChunkName: "emphasis_personal" */ '../views/emphasis_personal/index.vue'),
-        meta: { title: "重点人员", icon: require('../assets/icons/dhl_zdry@3x.png') }
-      },
-      {
-        path: '/emphasisPersonalEdit',
-        name: 'EmphasisPersonalEdit',
-        component: () => import(/* webpackChunkName: "emphasis_personal_edit" */ '../views/emphasis_personal/edit.vue'),
-        meta: { title: "重点人员", hide: true }
-      },
-      {
-        path: '/emphasisPersonalInfo',
-        name: 'EmphasisPersonalInfo',
-        component: () => import(/* webpackChunkName: "emphasis_personal_info" */ '../views/emphasis_personal/info.vue'),
-        meta: { title: "重点人员", hide: true}
-      },
+      
       {
         path: '/statistical',
         name: 'statistical',

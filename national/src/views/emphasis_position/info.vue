@@ -37,7 +37,10 @@
       <section class="c_middle">
         <div class="c_middle_title">
           <div class="title">走访记录</div>
-          <c-button flat iconType="ic_xinzeng" @click="handleCreate">
+          <c-button 
+            v-if="itemInfo.status == 'finish' || itemInfo.status == 'close'|| itemInfo.status == 'close_fail'"
+            flat iconType="ic_xinzeng" @click="handleCreate"
+          >
             <span >新增</span>
           </c-button>
         </div>
@@ -47,7 +50,7 @@
           class="c_table"
           :data="list"
           highlight-current-row
-          max-height="610"
+          height="610"
           style="width: 100%"
         >
           <el-table-column type="index" label="序号" wdith="100"></el-table-column>
@@ -148,11 +151,14 @@
             }"
           > 
             <template v-if="item.key === 'upload'">
-              <c-upload-btn
-                @change="handleImport"
-                :imageLth="recordInfo.attachmentList && recordInfo.attachmentList.length"
-                :videoLth="recordInfo.videoList && recordInfo.videoList.length"
-              ></c-upload-btn>
+              <div class="tip_wrap">
+                <c-upload-btn
+                  @change="handleImport"
+                  :imageLth="recordInfo.attachmentList && recordInfo.attachmentList.length"
+                  :videoLth="recordInfo.videoList && recordInfo.videoList.length"
+                ></c-upload-btn>
+                <div class="tip">被走访人需与走访民警同框</div>
+              </div>
               <div class="image_wrap" v-if="recordInfo.attachmentList && recordInfo.attachmentList.length > 0">
                 <div v-for="(i,index) in recordInfo.attachmentList" :key="i" class="upload_item">
                   <img
@@ -180,6 +186,7 @@
             :type="item.childType ? item.childType : 'text'"
             format="yyyy 年 MM 月 dd 日"
             value-format="yyyy-MM-dd HH:mm:ss"
+            :placeholder="item.placeholder"
           >
             <template v-if="item.type === 'el-select'" >
               <el-option v-for="item in computedOption(item.option)"
@@ -311,8 +318,8 @@ export default {
         { label: '走访地点', key: 'address', type: 'el-input'},
         { label: '被走访人', key: 'visitName',  type: 'el-input' },
         { label: '场所情况评估', key: 'thoughtEvaluation', type: 'el-select', option: 'tEvaluationList' },
-        { label: '评价', key: 'evaluation', type: 'el-select', option: 'evaluationList'},
-        { label: '走访情况', key: 'remark', type: 'el-input', childType: 'textarea'  },
+        // { label: '评价', key: 'evaluation', type: 'el-select', option: 'evaluationList'},
+        { label: '走访情况', key: 'remark', type: 'el-input', childType: 'textarea',  placeholder: 'XXXXXXXX（走访时间），民警  XXX（走访民警姓名）  至  XXXXXXX（走访地点） 走访  XXX（被走访人），经走访，该场所情况评定为：XXXX（场所情况评估）' },
         { label: "其他附件", key: 'upload', type: "div" , },
       ],
       rules: {
@@ -637,6 +644,7 @@ export default {
     },
     infoClose () {
       this.infoVisible = false
+      this.SET({ module: "record", key: "recordItem", value: {} })
     },
 
     handleEdit (row) {
@@ -723,5 +731,12 @@ export default {
 .big_video {
   width: 480px;
   height: 320px;
+}
+.tip_wrap {
+  display: flex;
+  .tip {
+    color: #ccc;
+    margin-left: 20px;
+  }
 }
 </style>
