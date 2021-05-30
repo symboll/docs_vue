@@ -62,6 +62,16 @@
           label="操作"
           width="200">
           <template slot-scope="scope">
+            <template v-if="scope.row.status === 'finish' && buttonList('infoSubmit').includes('exportWord')">
+              <el-button
+                @click.native.prevent="handleExport(scope.row)"
+                type="text"
+                size="small">
+                导出
+              </el-button>
+              <span> | </span>
+            </template>
+
             <template v-if="buttonList('InfoSubmit').includes('audit') && scope.row.status === 'init'">
               <el-button
                 @click.native.prevent="handleAudit(scope.row)"
@@ -152,6 +162,8 @@
 
 <script>
 import { mapActions, mapState, mapMutations, mapGetters } from "vuex";
+import { baseURL } from '../../config/index.js'
+import { getToken } from '../../lib/util.js'
 export default {
   data () {
     return {
@@ -273,7 +285,9 @@ export default {
       this.removeId =  row.id
       this.visible = true
     },
-
+    handleExport (row) {
+      window.location.href = `${baseURL}/api/info/submit/v1/export/${row.id}?Authorization=${getToken()}`
+    },
     handleAudit (row) {
       this.auditId = row.id
       this.auditVisible = true

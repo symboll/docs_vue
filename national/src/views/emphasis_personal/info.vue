@@ -71,7 +71,10 @@
               :width="item.width"  
             >
               <template slot-scope="scope">
-                <template v-if="item.property ==='status'">
+                <template v-if="item.property ==='recordTime'">
+                  <span> {{ timeMap(scope.row['recordTime']) }}</span>
+                </template>
+                <template v-else-if="item.property ==='status'">
                   <span> {{ statusMap[scope.row['status']] }}</span>
                 </template>
                 <template v-else>
@@ -85,6 +88,16 @@
             label="操作"
             width="200">
             <template slot-scope="scope">
+              <template v-if="scope.row.status === 'finish' && buttonList('person').includes('exportWord')">
+                <el-button
+                  @click.native.prevent="handleExport(scope.row)"
+                  type="text"
+                  size="small">
+                  导出
+                </el-button>
+                <span> | </span>
+              </template>
+
               <template v-if="scope.row.status === 'init' && buttonList('Record').includes('audit')">
                 <el-button
                   @click.native.prevent="handleAudit(scope.row)"
@@ -94,8 +107,7 @@
                 </el-button>
                 <span> | </span>
               </template>
-              <template v-if="(currentUser.userType === 3 && scope.row.status !== 'finish') 
-                          || (currentUser.userType === 1 && scope.row.status === 'finish')">
+              <template v-if="currentUser.userType === 1 && scope.row.status === 'finish'">
                 <el-button
                   @click.native.prevent="handleEvaluate(scope.row)"
                   type="text"
@@ -328,6 +340,8 @@
 <script>
 import { mapState, mapActions, mapMutations, mapGetters } from 'vuex'
 import CUploadBtn from '@/components/c-upload-btn'
+import { baseURL } from '../../config/index.js'
+import { getToken } from '../../lib/util.js'
 export default {
   components: {
     CUploadBtn
@@ -458,6 +472,10 @@ export default {
       'RECORD_ITEM_UPDATE',
       'SET'
     ]),
+    timeMap (time='') {
+      const t = time.split(' ')[0]
+      return t
+    },
     showValueMap (type, id) {
       let arr
       switch (type) {
@@ -614,6 +632,9 @@ export default {
     handleCurrentChange (val) {
       this.pagination.pageNo = val
       this.searchFn()  
+    },
+    handleExport (row) {
+      window.location.href = `${baseURL}/api/record/v1/exportWord/${row.id}?Authorization=${getToken()}`
     },
     handleAudit (row) {
       this.auditId = row.id

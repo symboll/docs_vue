@@ -175,7 +175,9 @@ export default {
       rotate:false,
       userSearchValue: "",
       tableHeader: [
+
         { property: 'username', label: '姓名', width: ''},
+        { property: 'accountName', label: '账号', width: ''},
         { property: 'telephone', label: '联系电话', width: ''},
         { property: 'orgName', label: '所属组织', width: ''},
         { property: 'roles', label: '所属角色', width: '260px'},
@@ -183,12 +185,14 @@ export default {
       ],
       createOrEditForm: [
         { label: '姓名', key: 'username', type: 'el-input'},
+        { label: '账号', key: 'accountName', type: 'el-input'},
         { label: '联系电话', key: 'telephone', type: 'el-input' },
         { label: '所属角色', key: 'roleIdList', type: 'el-select', option: "roleList", multiple: true},
         { label: '所属组织', key: 'orgId', type: 'el-select', option: "organList"},
       ],
       rules: {
         username: [{ required: true, message: '请输入姓名', trigger: 'blur' },],
+        accountName: [{ required: true, message: '请输入账号', trigger: 'blur' },],
         telephone: [{ required: true, message: '请输入联系电话', trigger: 'blur' },],
         roleIdList: [{ required: true, message: '请选择所属角色', trigger: 'blur' },],
         orgId: [{ required: true, message: '请选择所属组织', trigger: 'blur' },],

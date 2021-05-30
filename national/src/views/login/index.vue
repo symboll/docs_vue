@@ -5,7 +5,7 @@
       <div class="login_form">
         <div class="login_form_title">
           <span class="login_form_title_icon"></span>
-          <span>欢迎登陆</span>
+          <span>欢迎登录</span>
         </div>
         <div class="login_form_error">
           <span v-if="isError">账号或密码输入错误</span>
@@ -18,7 +18,7 @@
         <div class="login_form_input">
           <input type="password" v-model="form.password">
         </div>
-        <div class="login_form_button" @click="handleSubmit">登陆</div>
+        <div class="login_form_button" @click="handleSubmit">登录</div>
       </div>
     </div>
     <div class="login_foot">
