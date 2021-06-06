@@ -62,16 +62,17 @@
           label="操作"
           width="200">
           <template slot-scope="scope">
-            <template v-if="scope.row.status === 'finish' && buttonList('infoSubmit').includes('exportWord')">
-              <el-button
-                @click.native.prevent="handleExport(scope.row)"
-                type="text"
-                size="small">
-                导出
-              </el-button>
-              <span> | </span>
+            <template v-if="buttonList('infoSubmit').includes('exportWord')">
+              <template v-if="scope.row.status === 'finish'">
+                <el-button
+                  @click.native.prevent="handleExport(scope.row)"
+                  type="text"
+                  size="small">
+                  导出
+                </el-button>
+                <span> | </span>
+              </template>
             </template>
-
             <template v-if="buttonList('InfoSubmit').includes('audit') && scope.row.status === 'init'">
               <el-button
                 @click.native.prevent="handleAudit(scope.row)"

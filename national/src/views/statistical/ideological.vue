@@ -102,11 +102,11 @@ export default {
       taskTypeList: [{
          id: "auto", label: "自动"
       }, {
-        id: "taskDown", label: "任务下放"
+        id: "taskDown", label: "任务下派"
       }],
       taskMap: {
         auto: "自动",
-        taskDown: "任务下放"
+        taskDown: "任务下派"
       }
     }
   },
@@ -115,6 +115,7 @@ export default {
       list: state => state.statistical.ideologicalList,
       total: state => state.statistical.ideologicalTotal,
       psList: state => state.policeStationList,
+      currentUser: state => state.user.currentUser
     })
   },
   methods: {
@@ -145,8 +146,14 @@ export default {
       this.searchFn()      
     },
     init () {
-      this.getPoliceStationListAction()
-        .catch(err => console.log(err))
+      if(this.currentUser.userType === 1) {
+        // 保国大队
+        this.getPoliceStationListAction()
+          .catch(err => console.log(err))
+      }else {
+        this.searchList.splice(2,2)
+        this.tableHeader.splice(1,2)
+      }
     }
   },
   mounted() {

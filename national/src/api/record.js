@@ -16,7 +16,7 @@ export const getDetailApi = (type, params)=> {
 
 
 /**
- * 任务下放
+ * 任务下派
  * @param {*} id 
  * @returns 
  */

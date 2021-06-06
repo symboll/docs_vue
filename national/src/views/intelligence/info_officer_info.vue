@@ -36,7 +36,7 @@
             </div>
           </div>
 
-          <c-table-pagin 
+          <!-- <c-table-pagin 
             tableTitle="信息员接待联络情况"
             :list="receptionList"
             :total="receptionListTotal"
@@ -57,7 +57,7 @@
             @detail="handleDetail2"
             @edit="handleEdit2"
             @remove="handleRemove2"
-          />
+          /> -->
         </section>
       </div>
     </el-scrollbar>

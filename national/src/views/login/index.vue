@@ -1,6 +1,6 @@
 <template>
   <div class="login_wrap">
-    <div class="login_title">国保基础防控系统</div>
+    <div class="login_title">政安基础管控</div>
     <div class="login_card">
       <div class="login_form">
         <div class="login_form_title">

@@ -54,6 +54,7 @@ export default {
       searchObj: {},
       searchList: [
         { label: '所属派出所', key: 'orgId', value: '', type: 'el-select',option: "psList", clearable: true },
+        { label: '人员姓名', key: 'name', value: '', type: 'el-input', clearable: true },
         // { label: '统计时间', key: 'year', value: '', type: 'el-date-picker', 
         //     datePickerType: 'year', format: "yyyy 年", valueFormat: "yyyy",  clearable: true},
       ],
@@ -70,6 +71,7 @@ export default {
       list: state => state.statistical. visitList,
       total: state => state.statistical. visitTotal,
       psList: state => state.policeStationList,
+      currentUser: state => state.user.currentUser
     })
   },
   methods: {
@@ -82,6 +84,7 @@ export default {
         ...this.pagination,
         ...this.searchObj
       }
+      console.log('params==>',params)
       this.getVisitAction(params)
     },
     handleSearch (searchObj) {
@@ -97,8 +100,15 @@ export default {
       this.searchFn()      
     },
     init () {
-      this.getPoliceStationListAction()
-        .catch(err => console.log(err))
+      if(this.currentUser.userType === 1) {
+        // 保国大队
+        this.getPoliceStationListAction()
+          .catch(err => console.log(err))
+        this.searchList.splice(1,1)
+      }else {
+        this.searchList.splice(0,1)
+        this.tableHeader.splice(0,1, { property: 'deptName', label: '人员姓名', width: ''})
+      }
     }
   },
   mounted() {

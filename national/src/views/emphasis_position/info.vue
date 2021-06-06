@@ -78,16 +78,17 @@
             label="操作"
             width="200">
             <template slot-scope="scope">
-              <template v-if="scope.row.status === 'finish' && buttonList('position').includes('exportWord')">
-                <el-button
-                  @click.native.prevent="handleExport(scope.row)"
-                  type="text"
-                  size="small">
-                  导出
-                </el-button>
-                <span> | </span>
+              <template v-if="buttonList('position').includes('exportWord')">
+                <template v-if="scope.row.status === 'finish' || scope.row.status === 'evaluation'">
+                  <el-button
+                    @click.native.prevent="handleExport(scope.row)"
+                    type="text"
+                    size="small">
+                    导出
+                  </el-button>
+                  <span> | </span>
+                </template>
               </template>
-
               <template v-if="scope.row.status === 'init' && buttonList('Record').includes('audit')">
                 <el-button
                   @click.native.prevent="handleAudit(scope.row)"
@@ -333,7 +334,7 @@ export default {
         { label: '被走访人', key: 'visitName',  type: 'el-input' },
         { label: '场所情况评估', key: 'thoughtEvaluation', type: 'el-select', option: 'tEvaluationList' },
         // { label: '评价', key: 'evaluation', type: 'el-select', option: 'evaluationList'},
-        { label: '走访情况', key: 'remark', type: 'el-input', childType: 'textarea',  placeholder: 'XXXXXXXX（走访时间），民警  XXX（走访民警姓名）  至  XXXXXXX（走访地点） 走访  XXX（被走访人），经走访，该场所情况评定为：XXXX（场所情况评估）' },
+        { label: '走访情况', key: 'remark', type: 'el-input', childType: 'textarea',  placeholder: '经走访，该场所/人员情况评定为…..' },
         { label: "其他附件", key: 'upload', type: "div" , },
       ],
       rules: {

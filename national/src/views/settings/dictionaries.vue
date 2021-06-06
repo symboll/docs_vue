@@ -6,15 +6,17 @@
       </header>
       <section class="c_sidebar_body">
         <!-- :default-active="" -->
-        <el-menu @select="handleSelected"  >
-          <el-menu-item 
-            v-for="item in typeList"
-            :key="item.id"
-            :index="`${item.code}`"
-          >
-          <span>{{ item.name }}</span>
-          </el-menu-item>
-        </el-menu>
+        <el-scrollbar wrap-class="scrollbar-wrapper">
+          <el-menu @select="handleSelected"  >
+            <el-menu-item 
+              v-for="item in typeList"
+              :key="item.id"
+              :index="`${item.code}`"
+            >
+            <span>{{ item.name }}</span>
+            </el-menu-item>
+          </el-menu>
+        </el-scrollbar>
       </section>
     </aside>
     <section class="c_body">
@@ -275,7 +277,9 @@ export default {
 <style lang='scss' scoped>
   
   @import '@/assets/style/custom_sidebar.scss';
-
+  ::v-deep .scrollbar-wrapper.el-scrollbar__wrap{
+    height: calc(100vh - 128px) !important; 
+  }
   .c_body {
     padding: 0 !important;
     display: flex;

@@ -113,6 +113,7 @@ export default {
       list: state => state.statistical.finishedList,
       total: state => state.statistical.finishedTotal,
       psList: state => state.policeStationList,
+      currentUser: state => state.user.currentUser
     }),
     otherType () {
       // this.TypeMap,
@@ -140,15 +141,24 @@ export default {
     },
     handleChange () {
       this.type === 'person' ? this.type = 'position': this.type = 'person'
-      let label;
-      if(this.type === 'person') {
-        label = '重点人员数量'
-      }else if(this.type === 'position') {
-        label = '重点阵地数量'
+      if(this.currentUser.userType === 1) {
+        let label;
+        if(this.type === 'person') {
+          label = '重点人员数量'
+        }else if(this.type === 'position') {
+          label = '重点阵地数量'
+        }
+        this.tableHeader.splice(1,1, {
+          property: 'personCount', label, width: '',
+        })
+      }else {
+        this.searchList.splice(0,1, {
+          label: '阵地名称', key: 'name', value: '', type: 'el-input', clearable: true
+        })
+        this.tableHeader.splice(0,2, {
+          property: 'deptName', label: '阵地名称', width: ''
+        })
       }
-      this.tableHeader.splice(1,1, {
-        property: 'personCount', label, width: '',
-      })
       this.searchFn()
     },
     handleSearch (searchObj) {
@@ -164,8 +174,18 @@ export default {
       this.searchFn()      
     },
     init () {
-      this.getPoliceStationListAction()
-        .catch(err => console.log(err))
+      if(this.currentUser.userType === 1) {
+        // 保国大队
+        this.getPoliceStationListAction()
+          .catch(err => console.log(err))
+      }else {
+        this.searchList.splice(0,1, {
+          label: '人员名称', key: 'name', value: '', type: 'el-input', clearable: true
+        })
+        this.tableHeader.splice(0,2, {
+          property: 'deptName', label: '人员姓名', width: ''
+        })
+      }
     }
   },
   mounted() {
