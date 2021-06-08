@@ -166,6 +166,7 @@ import { debounce } from 'lodash-es'
 import { mapActions, mapState, mapGetters } from 'vuex'
 import OrganItem from '../../components/user_organ_item'
 import { deflate } from 'zlib';
+import { constants } from 'fs';
 export default {
   data() {
     return {
@@ -356,13 +357,16 @@ export default {
     }, 800),
 
     handleUserSearch () {
-
+      this.userListSearch(this.userSearchValue)
     },
 
-    userListSearch () {
+    userListSearch (username) {
       const params = {
         orgId: this.organId,
         ...this.pagination
+      }
+      if(username) {
+        params.username = username
       }
       this.getUserListAction(params)
         .then(res => console.log(res))
