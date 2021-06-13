@@ -582,9 +582,6 @@ export default {
       }else if (files[0].type.split('/')[0] !== type) { 
         this.$message.error('文件格式错误');
         return
-      }else if (files[0].type.split('/')[0] === 'video' && files[0].size > 2000000) {
-        this.$message.error('文件大小超出');
-        return
       }
       const formData = new FormData()
       formData.append('file', event.target.files[0])

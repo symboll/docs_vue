@@ -32,20 +32,22 @@
             @change="handleChange(item.key, itemInfo[item.key])"
           >            
             <template v-if="item.option">
-              <el-option 
-                v-if="item.key !== 'type'"
-                v-for="cur in computedList(item.option)"
-                :key="cur.id"
-                :label="cur.name"
-                :value="cur.id"
-              />
-              <el-option 
-                v-else
-                v-for="cur in computedList(item.option)"
-                :key="cur.id"
-                :label="cur.name"
-                :value="cur.name"
-              />
+              <template v-if="item.key == 'sysUserId' || item.key =='orgId'">
+                <el-option 
+                  v-for="cur in computedList(item.option)"
+                  :key="cur.id"
+                  :label="cur.name"
+                  :value="cur.id"
+                />
+              </template>
+              <template v-else>
+                <el-option 
+                  v-for="i in computedList(item.option)"
+                  :key="i"
+                  :label="i"
+                  :value="i"
+                />
+              </template>
             </template>
           </component>
         </el-form-item>
@@ -95,6 +97,8 @@ export default {
   },
   mounted() {
     this.init()
+    console.log('visitFrequencyList==>',this.visitFrequencyList)
+    console.log('typeList==>',this.typeList)
   },
   methods: {
     ...mapActions([
@@ -128,8 +132,8 @@ export default {
       switch (option) {
         case 'psList': return this.psList;
         case 'policeList': return this.policeList;
-        case 'visitFrequencyList': return this.visitFrequencyList;
-        case 'typeList': return this.typeList;
+        case 'visitFrequencyList': return this.visitFrequencyList.map(item => item.name);
+        case 'typeList': return this.typeList.map(item => item.name);
         default: return [];
       }
     },

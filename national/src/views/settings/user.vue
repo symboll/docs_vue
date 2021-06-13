@@ -140,6 +140,7 @@
             :is="item.type" 
             :multiple="item.multiple"
             v-model="userInfo[item.key]" 
+            @change="changeOrgan($event, item.key)"
           >            
             <template v-if="item.option && (item.key === 'orgId' || item.key === 'roleIdList')">
               <el-option 
@@ -163,7 +164,7 @@
 
 <script>
 import { debounce } from 'lodash-es'
-import { mapActions, mapState, mapGetters } from 'vuex'
+import { mapActions, mapState, mapGetters, mapMutations } from 'vuex'
 import OrganItem from '../../components/user_organ_item'
 import { deflate } from 'zlib';
 import { constants } from 'fs';
@@ -242,11 +243,19 @@ export default {
       'disableOrEnableAction',
       'resetPasswordAction'
     ]),
+    ...mapMutations([
+      'SET'
+    ]),
+    changeOrgan (event, key) {
+      if(key === 'orgId') {
+        this.organId =  event
+      }
+    },
     handleChange(event, row) {
       this.disableOrEnableAction({id: row.id, delFlag: event})
         .then(_ => {
           this.$message.success(event ? "启用成功": "禁用成功")
-          this.userListSearch(row.orgId)
+          this.userListSearch()
         })
         .catch(err => console.log(err))
     },
@@ -268,8 +277,7 @@ export default {
       this.deleteVisible = false
       this.deleteUserByIdAction(this.removeId)
         .then(res => {
-
-          this.userListSearch(this.orgId)
+          this.userListSearch()
           this.$message.success('删除成功!')
         })
     },
@@ -300,7 +308,8 @@ export default {
               .then(res => {
                 this.handleClose()
                 this.$message.success('修改成功！')
-                this.userListSearch(this.userInfo.orgId)
+                this.userListSearch()
+                this.SET({module: "user", key: "userInfo,", value: {}})
               })
               .catch(err => this.$message.error('修改失败！'+ err))
           }else {        
@@ -316,7 +325,8 @@ export default {
               .then(res => {
                 this.handleClose()
                 this.$message.success('创建成功！')
-                this.userListSearch(this.userInfo.orgId)
+                this.userListSearch()
+                this.SET({module: "user", key: "userInfo,", value: {}})
               })
               .catch(err => this.$message.error('创建失败！'+ err))
           }

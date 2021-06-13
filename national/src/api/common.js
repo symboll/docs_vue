@@ -32,7 +32,7 @@ export  const getDictTypeList = () => {
 // 文件上传
 export const commonUploadApi = (data) => {
   return axios.request({
-    url: `/common/upload`,
+    url: `/common/uploadApp`,
     method: "POST",
     headers: {
       'Content-Type': 'multipart/form-data'
