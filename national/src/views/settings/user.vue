@@ -166,8 +166,8 @@
 import { debounce } from 'lodash-es'
 import { mapActions, mapState, mapGetters, mapMutations } from 'vuex'
 import OrganItem from '../../components/user_organ_item'
-import { deflate } from 'zlib';
-import { constants } from 'fs';
+import md5 from 'md5'
+
 export default {
   data() {
     return {
@@ -318,7 +318,7 @@ export default {
               orgIdListStr: this.userInfo.orgId,
               roleIdListStr: this.userInfo.roleIdList.join('@'),
               accountName: this.userInfo.username,
-              password: 123456,
+              password: md5(123456).toUpperCase(),
               delFlag: true,
               online: true
             })

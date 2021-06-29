@@ -42,6 +42,7 @@
 <script>
 import { mapState,mapActions } from 'vuex'
 import { setToken } from '@/lib/util.js'
+import md5 from 'md5'
 export default {
   data() {
     return{
@@ -75,7 +76,9 @@ export default {
       this.$refs['form'].validate((valid) => {
         if (valid) {
           this.modifyPasswordApi({
-            ...this.form,
+            // ...this.form,
+            oldPwd: md5(this.form.oldPwd).toUpperCase(),
+            password: md5(this.form.password).toUpperCase(),
             id: this.currentUser.id
           }).then(res => {
             this.$message.success('修改成功!')

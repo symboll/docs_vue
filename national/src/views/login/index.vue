@@ -30,6 +30,7 @@
 
 <script>
 import { mapActions } from 'vuex'
+import md5 from 'md5'
 export default {
   data() {
     return {
@@ -46,7 +47,7 @@ export default {
     ]),
     handleSubmit () {
       const { accountName, password } = this.form
-      this.LoginAction({ accountName, password  }).then(_ => {
+      this.LoginAction({ accountName, password: md5(password).toUpperCase()  }).then(_ => {
         this.$router.push({ name: "Home" })
       }).catch(_ => this.isError = true);
     }

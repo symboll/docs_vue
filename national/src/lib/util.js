@@ -10,3 +10,6 @@ export const setToken = (token, tokenName = 'token') => {
 export const getToken = (tokenName = 'token') => {
   return Cookies.get(tokenName)
 }
+
+export const t = 0;
+export const d = '1628524800000'
